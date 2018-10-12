@@ -9,9 +9,28 @@ class App extends Component {
     super(props);
     this.state = {
       expression: '',
-      isVariable: false
+      isVariable: false,
+      isDelete: false,
+      isExport: false,
+      isExiting: false,
+      current_var:''
     };
   }
+
+  handleAddVar = () => {
+    alert("expression is now stored in memory location <M>")
+  }
+
+  handleDelVar = () => {
+    alert("Now deleted expression in memory")
+  }
+
+  handleGetVar = () => {
+
+    console.log("Getting expressions...")
+
+  }
+
   handleChange = async (e,data) => {
 
     const nGROKendpoint = 'http://127.0.0.1:8080/getresult';
@@ -25,7 +44,12 @@ class App extends Component {
     this.setState({
       expression: await rawResponse.text()
     });
+
     this.checkInput();
+    this.checkImport();
+    this.checkExport();
+    this.checkDelete();
+    this.checkClose();
   }
 
   checkInput = () => {
@@ -40,10 +64,79 @@ class App extends Component {
         isVariable: false
       });
     }
-
   }
+
+  checkClose = () => {
+    const { expression } = this.state;
+
+    if(expression.length >= 4 && expression.includes("exit")){
+      this.setState({
+        isExiting: expression.includes("exit"),
+        isVariable: false
+      });
+    }
+    else {
+      this.setState({
+        isExiting: false
+      });
+    }
+  }
+
+  checkDelete = () => {
+    const {expression} = this.state;
+
+    if(expression.length >= 5 && expression.includes("clear")){
+      this.setState({
+        isDelete: expression.includes("clear"),
+        isVariable: false
+      });
+    }
+    else {
+      this.setState({
+        isDelete: false
+      });
+    }
+  }
+
+  checkExport = () => {
+    const {expression} = this.state;
+
+    if(expression.length >= 6 && expression.includes("export")){
+      this.setState({
+        isExport: expression.includes("export"),
+        isVariable: false
+      });
+    }
+    else {
+      this.setState({
+        isExport: false
+      });
+    }
+  }
+
+  checkImport = () => {
+    const {expression} = this.state;
+
+    if(expression.length >= 6 && expression.includes("import")){
+      this.setState({
+        isImport: expression.includes("import"),
+        isVariable: false
+      });
+    }
+    else {
+      this.setState({
+        isImport: false
+      });
+    }
+  }
+
+  closeSession = () => {
+    alert("I'm a web app! Just close the browser.")
+  }
+
   render() {
-    const { isVariable, expression }  = this.state;
+    const { isVariable, isDelete, isExport, isImport, isExiting, expression }  = this.state;
+
     return (
       <div className="App">
         <header className="App-header">
@@ -51,7 +144,8 @@ class App extends Component {
             <Image size='small' centered src={logo} className="App-logo" alt="logo" />
             <p style={{paddingTop: 30, paddingBottom: 30}}>
             <code>Input an algebraic expression.</code>
-          </p>{
+          </p>
+          {
             isVariable &&
             <div style={{paddingBottom: 20}}>
             <Button size="big" fluid color='yellow'>
@@ -59,7 +153,42 @@ class App extends Component {
             </Button>
           </div>
           }
+          {
+            isDelete &&
+            <div style={{paddingBottom: 20}}>
+            <Button size="big" fluid color='red'>
+              Delete Variable
+            </Button>
+          </div>
+          }
+          {
+            isExport &&
+            <div style={{paddingBottom: 20}}>
+            <Button size="big" fluid color='green'>
+              Export Session
+            </Button>
+          </div>
+          }
+          {
+            isImport &&
+            <div style={{paddingBottom: 20}}>
+            <Button size="big" fluid color='blue'>
+              Import Session
+            </Button>
+          </div>
+          }
+          {
+            isExiting &&
+            <div style={{paddingBottom: 20}}>
+            <Button onClick={this.closeSession} size="big" fluid color='grey'>
+              Exit
+            </Button>
+          </div>
+          }
             <Input label='exp' onChange={this.handleChange} fluid size="medium" icon='calculator' placeholder='Numbers go here...' />
+            <Button.Group>
+
+            </Button.Group>
             <Header style={{paddingTop: 80, color: 'white'}} size='huge'>
               {expression}
             </Header>
