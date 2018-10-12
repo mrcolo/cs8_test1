@@ -13,10 +13,10 @@ class App extends Component {
   }
   handleChange = async (e,data) => {
 
-    const nGROKendpoint = 'https://0dd3c7f9.ngrok.io';
+    const nGROKendpoint = 'http://localhost:8080/string';
 
     const rawResponse = await fetch(nGROKendpoint, { method: 'POST',
-        url: 'https://0dd3c7f9.ngrok.io',
+        url: 'http://localhost:8080',
         headers: { 'content-type': 'text/plain' },
         body: data.value
       }
