@@ -23,21 +23,41 @@ using HttpServer = SimpleWeb::Server<SimpleWeb::HTTP>;
 using HttpClient = SimpleWeb::Client<SimpleWeb::HTTP>;
 
 int main() {
-  // HTTP-server at port 8080 using 1 thread
-  // Unless you do more heavy non-threaded processing in the resources,
-  // 1 thread is usually faster than several threads
+
   HttpServer server;
   server.config.port = 8080;
 
-  server.resource["^/string$"]["POST"] = [](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
-    // Retrieve string:
+    //Gets a string as an input, and returns the evaluation
+  server.resource["^/getresult$"]["POST"] = [](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
+    // Retrieve string from request:
     auto content = request->content.string();
+    //Responses work as streams
+    //calculator.evaluate(request->content.string())
     *response << "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Length: " << content.length() << "\r\n\r\n"
               << content;
-
-      // Alternatively, use one of the convenience functions, for instance:
-    // response->write(content);
   };
+
+    server.resource["^/addvar$"]["POST"] = [](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
+
+        //Take the string from request
+        auto content = request->content.string();
+
+        //auto content = calculator.addVar(content)
+        //we can return a bool and send it as a JSON to cover exceptions.
+        *response << "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Length: " << content.length() << "\r\n\r\n"
+                  << content;
+
+    };
+
+    server.resource["^/getvar$"]["GET"] = [](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
+
+        //auto content = calculator.getVars();
+        //returns a string in JSON style with all the variables.
+        auto content = request->content.string();
+        *response << "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Length: " << content.length() << "\r\n\r\n"
+                  << content;
+
+    };
 
   server.resource["^/json$"]["POST"] = [](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
     try {
@@ -56,45 +76,7 @@ int main() {
     }
   };
 
-  // GET-example for the path /info
-  // Responds with request-information
-  server.resource["^/info$"]["GET"] = [](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
-    stringstream stream;
-    stream << "<h1>Request from " << request->remote_endpoint_address() << ":" << request->remote_endpoint_port() << "</h1>";
-
-    stream << request->method << " " << request->path << " HTTP/" << request->http_version;
-
-    stream << "<h2>Query Fields</h2>";
-    auto query_fields = request->parse_query_string();
-    for(auto &field : query_fields)
-      stream << field.first << ": " << field.second << "<br>";
-
-    stream << "<h2>Header Fields</h2>";
-    for(auto &field : request->header)
-      stream << field.first << ": " << field.second << "<br>";
-
-    response->write(stream);
-  };
-
-  // GET-example for the path /match/[number], responds with the matched string in path (number)
-  // For instance a request GET /match/123 will receive: 123
-  server.resource["^/match/([0-9]+)$"]["GET"] = [](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
-    response->write(request->path_match[1]);
-  };
-
-  // GET-example simulating heavy work in a separate thread
-  server.resource["^/work$"]["GET"] = [](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> /*request*/) {
-    thread work_thread([response] {
-      this_thread::sleep_for(chrono::seconds(5));
-      response->write("Work done");
-    });
-    work_thread.detach();
-  };
-
-  // Default GET-example. If no other matches, this anonymous function will be called.
-  // Will respond with content in the web/-directory, and its subdirectories.
-  // Default file: index.html
-  // Can for instance be used to retrieve an HTML 5 client that uses REST-resources on this server
+  //GET basic homepage
   server.default_resource["GET"] = [](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
     try {
       auto web_root_path = boost::filesystem::canonical("web");
@@ -107,9 +89,6 @@ int main() {
         path /= "index.html";
 
       SimpleWeb::CaseInsensitiveMultimap header;
-
-      // Uncomment the following line to enable Cache-Control
-      // header.emplace("Cache-Control", "max-age=86400");
 
 #ifdef HAVE_OPENSSL
 #endif
@@ -162,34 +141,12 @@ int main() {
   thread server_thread([&server]() {
     // Start server
     server.start();
+
   });
+    cout<<"Calc Server has started at port 8080"<<endl;
 
   // Wait for server to start so that the client can connect
   this_thread::sleep_for(chrono::seconds(1));
-
-  // Client examples
-  HttpClient client("localhost:8080");
-
-  string json_string = "{\"firstName\": \"Francesco\",\"lastName\": \"Colonnese\",\"age\": 25}";
-
-  // Synchronous request examples
-  try {
-    auto r1 = client.request("GET", "/match/123");
-    cout << r1->content.rdbuf() << endl; // Alternatively, use the convenience function r1->content.string()
-
-    auto r2 = client.request("POST", "/string", json_string);
-    cout << r2->content.rdbuf() << endl;
-  }
-  catch(const SimpleWeb::system_error &e) {
-    cerr << "Client request error: " << e.what() << endl;
-  }
-
-  // Asynchronous request example
-  client.request("POST", "/json", json_string, [](shared_ptr<HttpClient::Response> response, const SimpleWeb::error_code &ec) {
-    if(!ec)
-      cout << response->content.rdbuf() << endl;
-  });
-  client.io_service->run();
 
   server_thread.join();
 }
