@@ -32,11 +32,9 @@ class App extends Component {
   }
 
   handleChange = async (e,data) => {
-
     const nGROKendpoint = 'http://127.0.0.1:8080/getresult';
-
     const rawResponse = await fetch(nGROKendpoint, { method: 'POST',
-        headers: { 'content-type': 'text/plain' },
+	headers: { 'content-type': 'text/plain' },
         body: data.value
       }
       );
