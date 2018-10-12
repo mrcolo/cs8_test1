@@ -5,8 +5,8 @@
 #define PARSER_H
 #include <iostream>
 #include <fstream>
-#include <vector>
 #include <cmath>
+#include <map>
 #include "Queue.h"
 #include "Stack.h"
 
@@ -50,7 +50,7 @@ private:
     Queue<data> tokens;
     Stack<double> operands;
     Stack<char> operators;
-    std::vector<double> memories;
+    std::map<char,double> memories;
 
     // Private functions.
     void nuke();
