@@ -16,7 +16,6 @@ class App extends Component {
     const nGROKendpoint = 'http://localhost:8080/string';
 
     const rawResponse = await fetch(nGROKendpoint, { method: 'POST',
-        url: 'http://localhost:8080',
         headers: { 'content-type': 'text/plain' },
         body: data.value
       }
