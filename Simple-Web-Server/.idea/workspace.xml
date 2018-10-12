@@ -31,7 +31,7 @@
       <file leaf-file-name="http_examples.cpp" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/http_examples.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="322">
+            <state relative-caret-position="256">
               <caret line="30" column="30" lean-forward="false" selection-start-line="30" selection-start-column="30" selection-end-line="30" selection-end-column="30" />
               <folding>
                 <element signature="e#0#26#0" expanded="true" />
@@ -153,12 +153,12 @@
       <updated>1539324635539</updated>
       <workItem from="1539324638508" duration="1524000" />
       <workItem from="1539328035940" duration="346000" />
-      <workItem from="1539329769539" duration="4343000" />
+      <workItem from="1539329769539" duration="4673000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="6213000" />
+    <option name="totallyTimeSpent" value="6543000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="22" width="1440" height="878" extended-state="6" />
@@ -217,7 +217,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/http_examples.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="322">
+        <state relative-caret-position="256">
           <caret line="30" column="30" lean-forward="false" selection-start-line="30" selection-start-column="30" selection-end-line="30" selection-end-column="30" />
           <folding>
             <element signature="e#0#26#0" expanded="true" />

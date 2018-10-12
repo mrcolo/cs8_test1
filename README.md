@@ -7,10 +7,14 @@ A scientific calculator in a web app
 FIRST TIME: To build start the server run
 
 ```
+
 bash getstarted.sh
 
 ```
 AFTER INSTALLING NODE.JS, to run the client: 
 ```
-bash start_client.sh
+
+npm install
+
+npm start
 ```
