@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import logo from './assets/logo.png';
 import './App.css';
 import 'semantic-ui-css/semantic.min.css';
-import {Input, Image, Header, Button} from 'semantic-ui-react'
+import {Input, Image, Header, Button, List, Icon} from 'semantic-ui-react'
 
 class App extends Component {
   constructor(props) {
@@ -184,12 +184,46 @@ class App extends Component {
           </div>
           }
             <Input label='exp' onChange={this.handleChange} fluid size="medium" icon='calculator' placeholder='Numbers go here...' />
-            <Button.Group>
-
-            </Button.Group>
+            {expression.length === 0 &&
+              <div style={{paddingTop: 30}}>
+                <List inverted size="small" animated verticalAlign='middle'>
+                  <List.Item>
+                    <Icon name='plus' size='large' />
+                    <List.Content>
+                      <List.Header>add expression: f = ...</List.Header>
+                    </List.Content>
+                  </List.Item>
+                  <List.Item>
+                    <Icon name='delete' size='large' />
+                    <List.Content>
+                      <List.Header>clear expression: clear f</List.Header>
+                    </List.Content>
+                  </List.Item>
+                  <List.Item>
+                    <Icon name='folder open outline' size='large' />
+                    <List.Content>
+                      <List.Header>import</List.Header>
+                    </List.Content>
+                  </List.Item>
+                  <List.Item>
+                    <Icon name='share' size='large' />
+                    <List.Content>
+                      <List.Header>export</List.Header>
+                    </List.Content>
+                  </List.Item>
+                  <List.Item>
+                    <Icon name='log out' size='large' />
+                    <List.Content>
+                      <List.Header>exit</List.Header>
+                    </List.Content>
+                  </List.Item>
+                </List>
+              </div>
+            }
             <Header style={{paddingTop: 80, color: 'white'}} size='huge'>
               {expression}
             </Header>
+
         </div>
         </header>
       </div>
