@@ -23,7 +23,6 @@ public:
     Parser& operator=(const Parser &other);
 
     // Class functions.
-    double evaluate_exp(std::string input);
     void tokenize(std::string input);
     void infixToPostfix();
     double evaluatePostfix();

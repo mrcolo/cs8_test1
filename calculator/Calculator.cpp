@@ -83,7 +83,9 @@ bool Calculator::evaluate(string s, double& d){
     try {
         exp_action.push(EVAL);
         exp_values.push(s);
-        //TODO ARMAN IS DONE d = p.evaluate(s);
+        p.tokenize(s);
+        p.infixToPostfix();
+        d = p.evaluatePostfix();
     }
     catch (EXPRESSION_ERRORS e) {
         if (e == BAD_EXP)

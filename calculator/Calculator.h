@@ -31,7 +31,7 @@ private:
     string* memory_exp;
     double* memory_val;
 
-    //Parser p;
+    Parser p;
     map<CALC_ACTIONS,string> m1;
     map<string,CALC_ACTIONS> m2;
 
