@@ -1,37 +1,34 @@
 #include <iostream>
-#include <fstream>
-#include "Parser.h"
-#include "Queue.h"
-#include "Stack.h"
+#include "Calculator.h"
 using namespace std;
 
 int main() {
-    Parser test;
-    string exp("12 + 8 / (2)");
-    try {
-        test.tokenize(exp);
-        test.infixToPostfix();
-        double answer = test.evaluatePostfix();
-        cout << answer;
-    } catch (EXPRESSION_ERRORS e) {
+    try{
+        Calculator c;
+
+        c.addVar("a = 2x^2 + 2");
+        cout<<"ADDING VALUE A "<<endl;
+        cout<<c.getVars();
+
+        c.deleteVar('a');
+        cout<<"AFTER DELETION: "<<endl;
+        cout<<c.getVars();
+
+        cout<<"TRYING TO EXPORT"<<endl;
+        cout<<c.exportSession();
+
+        string import = "ADDV a = 2x^2 + 2\nDELV a";
+        c.importSession(import);
+    }
+    catch (EXPRESSION_ERRORS e) {
         switch (e) {
             case BAD_EXP: cout << "BAD EXPRESSION" << endl; break;
             case EMPTY_EXP: cout << "EMPTY EXPRESSION" << endl; break;
         }
-    } catch (STACK_ERRORS e) {
-        switch (e) {
-            case SFULL: cout << "STACK FULL" << endl; break;
-            case SEMPTY: cout << "STACK EMPTY" << endl; break;
-            case SBAD_SIZE: cout << "STACK BAD SIZE" << endl; break;
-        }
-    } catch (QUEUE_ERRORS e) {
-        switch (e) {
-            case QFULL: cout << "QUEUE FULL" << endl; break;
-            case QEMPTY: cout << "QUEUE EMPTY" << endl; break;
-            case QBAD_SIZE: cout << "QUEUE BAD SIZE" << endl; break;
-        }
-    } catch (...) {
+    }
+    catch (...) {
         cout << "UNKNOWN ERROR" << endl;
     }
+
     return 0;
 }
