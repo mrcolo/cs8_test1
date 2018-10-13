@@ -83,6 +83,7 @@ bool Calculator::evaluate(string s, double& d){
     try {
         exp_action.push(EVAL);
         exp_values.push(s);
+
         p.tokenize(s);
         p.infixToPostfix();
         d = p.evaluatePostfix();
