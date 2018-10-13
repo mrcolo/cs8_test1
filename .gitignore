@@ -1,5 +1,5 @@
-calculator/cmake-build-debug/
-calculator/.idea/
-calculator/main.cpp
-calculator/CMakeLists.txt
 .DS_Store
+webserver/.idea/
+webserver/cmake-build-debug/
+webserver/CMakeLists.txt
+
