@@ -11,7 +11,7 @@ enum QUEUE_ERRORS {QFULL, QEMPTY, QBAD_SIZE};
 template<typename T>
 class Queue {
 public:
-    explicit Queue(int c = 10);
+    explicit Queue(int c = 69);
     ~Queue();
     Queue(const Queue<T> &other);
     Queue<T>& operator=(const Queue<T> &other);

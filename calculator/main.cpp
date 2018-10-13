@@ -6,19 +6,13 @@
 using namespace std;
 
 int main() {
-    // running tests on stack and queue classes
-    Stack<char> operators(7);
-    Stack<double> operands(20);
-    Queue<char> q_ops(7);
-    Queue<double> q_nums(20);
-
+    Parser test;
+    string exp("12 + 8 / (2)");
     try {
-        // running tests on stack and queue classes
-        q_ops << '+' << '-' << '*' << '/' << '^' << '(' << ')';
-        q_nums << 2 << 3.14 << 7.5 << 1.0 / 3;
-        cout << q_ops << endl;
-        cout << q_nums << endl;
-
+        test.tokenize(exp);
+        test.infixToPostfix();
+        double answer = test.evaluatePostfix();
+        cout << answer;
     } catch (EXPRESSION_ERRORS e) {
         switch (e) {
             case BAD_EXP: cout << "BAD EXPRESSION" << endl; break;

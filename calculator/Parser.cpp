@@ -22,169 +22,111 @@ Parser& Parser::operator=(const Parser &other) {
     return *this;
 }
 
-// NEED TO TEST (PROBABLY BUGGY)
 // Function to take input expression (string) and convert into tokens for queue.
 void Parser::tokenize(const std::string input) {
     if (!isValid(input))
         throw BAD_EXP;
-    expression = input;
     int j = 0;
+    // Increment input until the end.
     for (int i = 0; i < input.length(); ++i, ++j) {
         if (tokens.full())
             throw QFULL;
         // If character is a delimiter, move on.
-        if (input[i] == ' ' || input[i] == ',')
+        if (input[i] == ' ' || input[i] == ',') {
             continue;
-        // If character is an operator or parenthesis or letter (A-Z), add to token queue
-        if (isOperator(input[i]) || isParens(input[i]) || isLetter(input[i]))
-            tokens[j].c = input[i];
-        // If character is a number, check for decimal and add to token queue
-        else if (isDigit(input[i]) || i == '.') {
-            std::string temp;
-            while (isDigit(input[i]) || i == '.') {
-                temp += input[i];
+        }
+        // If character is an operator or parenthesis, add to token queue.
+        if (isOperator(input[i]) || isParens(input[i])) {
+            tokens.enqueue(input[i]);
+        }
+        // If character is a letter (A-Z), grab memory value and add to token queue.
+        if (isLetter(input[i])) {  // TODO "HAS_VALUE" BOOL CHECKER
+//            tokens.enqueue(memories[i]);
+        }
+        // If character is a number, check for decimal and add double to token queue.
+        else if (isDigit(input[i]) || input[i] == '.') {
+            std::string num;
+            while (isDigit(input[i]) || input[i] == '.') {
+                num += input[i];
                 ++i;
             }
             --i;
-            tokens[j].d = std::stod(temp);
+            tokens.enqueue(std::stod(num));
         }
     }
+    std::cout << tokens << std::endl;
 }
 
-// NEED TO FIX MY OLD CODE (IMPLEMENT CLASS FEATURES AND OBJECTS)
 // Function to convert queue of tokens into postfix (RPN) string.
 void Parser::infixToPostfix() {
-
-    Stack<char> s;
-    s.push('?');
-    std::string result;
-
+    boost::variant<double,char> token;
+    bool isNegative = false;
+    // Increment tokens queue until empty.
     while (!tokens.empty()) {
-
-        if ()
-
-    }
-
-    for (int i = 0; i < tokens.getSize(); ++i) {
-
-        // If the scanned character is an operand, add it to output string.
-        if (isOperand([i]))
-        {
-            while(i < input.length() && isOperand(input[i]))
-            {
-                result += input[i];
-                i++;
+        token = tokens.dequeue();
+        // If the scanned character is an operand, add it to output queue.
+        if (token.type() == typeid(double)) {
+            if (isNegative) {
+                token = boost::get<double>(token) * -1;
+                isNegative = false;
             }
-            i--;
-            result += ' ';
+            postfix.enqueue(token);
         }
-
-            // If the scanned character is an ‘(‘, push it to the stack.
-        else if (input[i] == '(')
-            s.push('(');
-
-            // If the scanned character is an ‘)’, pop to output string from the stack until an ‘(‘ is encountered.
-        else if (input[i] == ')')
-        {
-            while (s.top() != '?' && s.top() != '(')
-            {
-                char C = s.top();
-                s.pop();
-                result += C;
-                result += ' ';
+        // If the scanned character is an ‘(‘, push it to the operator stack.
+        else if (boost::get<char>(token) == '(') { // TODO ISSUE IS HERE WITH NEGATIVE
+            if (tokens.peek().type() == typeid(char) && boost::get<char>(tokens.peek()) == '-') {
+                isNegative = true;
             }
-            if (s.top() == '(')
-                s.pop();
+            operators.push(boost::get<char>(token));
         }
-
-            // If an operator is scanned
-        else {
-
-            // Special case for negative sign
-            if (input[i] == '-' && input[i-1] == '(')
-            {
-                result += '0';
-                result += ' ';
+        // If the scanned character is an ‘)’, pop to output string from the stack until an ‘(‘ is encountered.
+        else if (boost::get<char>(token) == ')') {
+            while (operators.peek() != '(')
+                postfix.enqueue(operators.pop());
+            operators.pop();
+        }
+        // If an operator is scanned
+        else if (isOperator(boost::get<char>(token))) {
+            // Check for operator precedence and add operators to output queue accordingly.
+            while (!operators.empty() && operators.peek() != '(' && (prec(boost::get<char>(token)) <= prec(operators.peek())) ) {
+                postfix.enqueue(operators.pop());
             }
-
-            // precedence check
-            while (s.top() != '?' && prec(input[i]) <= prec(s.top()))
-            {
-                char C = s.top();
-                s.pop();
-                result += C;
-                result += ' ';
-            }
-            s.push(input[i]);
+            operators.push(boost::get<char>(token));
         }
     }
-
     //Pop all the remaining elements from the stack
-    while (s.top() != '?')
-    {
-        char C = s.top();
-        s.pop();
-        result += C;
-        result += ' ';
+    while (!operators.empty()) {
+        postfix.enqueue(operators.pop());
     }
-    return result;
+    std::cout << postfix << std::endl;
 }
 
-// NEED TO FIX MY OLD CODE (IMPLEMENT NEW CLASS FEATURES AND OBJECTS)
 // Function to evaluate Postfix expression (string) and return output.
 double Parser::evaluatePostfix() {
-    // Declaring a Stack from Standard template library in C++.
-    Stack<double> s;
-
-    for (int i = 0; i < input.length(); i++)
-    {
-        // Scanning each character from left.
-        // If character is a delimiter, move on.
-        if (input[i] == ' ' || input[i] == ',')
-            continue;
-
-            // If character is operator, pop two elements from stack, perform operation and push the result back.
-        else if (isOperator(input[i]))
-        {
-            // Pop two operands.
-            double operand2 = s.pop();
-            double operand1 = s.pop();
-
-            // Perform operation
-            double result = performOperation(input[i], operand1, operand2);
-
-            //Push back result of operation on stack.
-            s.push(result);
+    boost::variant<double,char> token;
+    // Increment postfix queue until empty.
+    while (!postfix.empty()) {
+        token = postfix.dequeue();
+        // If character is an operand, push to operand stack;
+        if (token.type() == typeid(double)) {
+            operands.push(boost::get<double>(token));
         }
-
-            // If character is digit or variable, extract the numeric operand from the string.
-        else if (isOperand(input[i]))
-        {
-            double operand = 0;
-
-            // Keep incrementing i as long as you are getting a numeric digit.
-            while(i < input.length() && isOperand(input[i]))
-            {
-                // Every time we get a digit towards right, we can multiply current total in operand by 10
-                // and add the new digit.
-                if (isDigit(input[i]))
-                {
-                    operand = (operand * 10) + (input[i] - '0');
-                    i++;
-                }
-            }
-            // We don't want to skip the non-numeric character by incrementing i twice.
-            i--;
-
-            // Push operand on stack.
-            s.push(operand);
+        // If character is operator, pop two elements from stack, perform operation and push the result back.
+        else if (isOperator(boost::get<char>(token))) {
+            // Pop two operands.
+            double operand2 = operands.pop();
+            double operand1 = operands.pop();
+            // Perform operation
+            double result = performOperation(boost::get<char>(token), operand1, operand2);
+            //Push back result of operation on stack.
+            operands.push(result);
         }
     }
-    // If input is in correct format, Stack will have one element. This will be the output.
-    return s.top();
+    // If input is in correct format, operand stack will have one element. This will be the output.
+    return operands.pop();
 }
 
-// NEED TO TEST
+// TODO FPTR IMPLEMENTATION
 // Function to perform an operation and return output.
 double Parser::performOperation(char operation, double operand1, double operand2) {
     switch (operation) {
@@ -204,10 +146,11 @@ double Parser::performOperation(char operation, double operand1, double operand2
     }
 }
 
-// NEED TO WRITE
+// TODO WRITE ISVALID FUNCTION IN CALCULATOR CLASS
 // Function to check if input expression is valid.
 bool Parser::isValid(const std::string input) {
     // check std::string expression and return true or false...
+    return true;
 }
 
 // Function to check if character is letter or digit.
@@ -251,22 +194,22 @@ int Parser::prec(char C) {
         return -1;
 }
 
-// NEED TO WRITE
+// TODO WRITE NUKE
 void Parser::nuke() {
 
 }
 
-// NEED TO WRITE
+// TODO WRITE COPY
 void Parser::copy(const Parser &other) {
 
 }
 
-// NEED TO WRITE
+// TODO WRITE <<
 std::ostream& operator<<(std::ostream &out, const Parser &p) {
     return out;
 }
 
-// NEED TO WRITE
+// TODO WRITE >>
 std::istream& operator>>(std::istream &in, Parser &p) {
     return in;
 }

@@ -7,6 +7,8 @@
 #include <fstream>
 #include <cmath>
 #include <map>
+#include <boost/variant.hpp>
+#include <boost/lexical_cast.hpp>
 #include "Queue.h"
 #include "Stack.h"
 
@@ -14,9 +16,6 @@ enum EXPRESSION_ERRORS {EMPTY_EXP, BAD_EXP};
 
 class Parser {
 public:
-    // Union for managing data types in token queue.
-    union data { double d; char c; };
-
     // Constructors.
     Parser();
     ~Parser();
@@ -41,16 +40,12 @@ public:
     friend std::istream& operator>>(std::istream &in, Parser &p);
 
 private:
-    // Private objects.
-    double result{};
-    std::string expression{};
-    std::string postfix{};
-
     // Private containers.
-    Queue<data> tokens;
+    Queue<boost::variant<double,char>> tokens;
+    Queue<boost::variant<double,char>> postfix;
     Stack<double> operands;
     Stack<char> operators;
-    std::map<char,double> memories;
+//    std::map<char,double> memories;
 
     // Private functions.
     void nuke();

@@ -11,7 +11,7 @@ enum STACK_ERRORS {SFULL, SEMPTY, SBAD_SIZE};
 template<typename T>
 class Stack {
 public:
-    explicit Stack(int c = 10);
+    explicit Stack(int c = 69);
     ~Stack();
     Stack(const Stack<T> &other);
     Stack<T>& operator=(const Stack<T> &other);
