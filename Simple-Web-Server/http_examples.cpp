@@ -20,7 +20,6 @@ using namespace std;
 using namespace boost::property_tree;
 
 using HttpServer = SimpleWeb::Server<SimpleWeb::HTTP>;
-using HttpClient = SimpleWeb::Client<SimpleWeb::HTTP>;
 
 int main() {
 
@@ -32,6 +31,7 @@ int main() {
     // Retrieve string from request:
     auto content = request->content.string();
     //Responses work as streams
+
     //calculator.evaluate(request->content.string())
     *response << "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Length: " << content.length() << "\r\n\r\n"
               << content;
@@ -49,32 +49,53 @@ int main() {
 
     };
 
-    server.resource["^/getvar$"]["GET"] = [](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
+    server.resource["^/import$"]["POST"] = [](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
 
-        //auto content = calculator.getVars();
-        //returns a string in JSON style with all the variables.
+        //Take the string from request
         auto content = request->content.string();
+
+        //auto content = calculator.importData(content)
+        //we can return a bool and send it as a JSON to cover exceptions.
         *response << "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Length: " << content.length() << "\r\n\r\n"
                   << content;
 
     };
 
-  server.resource["^/json$"]["POST"] = [](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
-    try {
-      ptree pt;
-      read_json(request->content, pt);
+    server.resource["^/export"]["GET"] = [](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
 
-      auto name = pt.get<string>("firstName") + " " + pt.get<string>("lastName");
+        //Take the string from request
+        auto content = request->content.string();
 
-      *response << "HTTP/1.1 200 OK\r\n"
-                << "Content-Length: " << name.length() << "\r\n\r\n"
-                << name;
-    }
-    catch(const exception &e) {
-      *response << "HTTP/1.1 400 Bad Request\r\nContent-Length: " << strlen(e.what()) << "\r\n\r\n"
-                << e.what();
-    }
-  };
+        //auto content = calculator.exportData(content)
+        //we can return a bool and send it as a JSON to cover exceptions.
+        *response << "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Length: " << content.length() << "\r\n\r\n"
+                  << content;
+
+    };
+
+    server.resource["^/clear"]["DELETE"] = [](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
+
+        //Take the string from request
+        auto content = request->content.string();
+
+        //auto content = calculator.clearVar(content)
+        //we can return a bool and send it as a JSON to cover exceptions.
+        *response << "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Length: " << content.length() << "\r\n\r\n"
+                  << content;
+
+    };
+
+    server.resource["^/getvar$"]["GET"] = [](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
+
+
+        //returns a string in JSON style with all the variables.
+        //auto content = calculator.getVars();
+
+        auto content = request->content.string();
+        *response << "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Length: " << content.length() << "\r\n\r\n"
+                  << content;
+
+    };
 
   //GET basic homepage
   server.default_resource["GET"] = [](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {

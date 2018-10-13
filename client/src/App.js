@@ -51,13 +51,13 @@ class App extends Component {
   }
 
   checkInput = () => {
-    const {expression} = this.state;
+    const { expression } = this.state;
     if(expression.length !== 0){
       this.setState({
         isVariable: expression[0].match(/[a-z]/i)
       });
     }
-    else {
+    else{
       this.setState({
         isVariable: false
       });
