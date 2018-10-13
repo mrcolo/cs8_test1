@@ -1,6 +1,6 @@
 .DS_Store
-webserver/calculator/.idea/*
 webserver/calculator/cmake-build-debug/*
-webserver/calculator/CMakeLists.txt
+webserver/calculator/.idea/workspace.xml
 webserver/cmake-build-debug/*
+webserver/.idea/workspace.xml
 webserver/build/*
