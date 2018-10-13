@@ -2,4 +2,6 @@
 webserver/.idea/
 webserver/cmake-build-debug/
 webserver/CMakeLists.txt
-
+webserver/calculator/.idea
+webserver/calculator/cmake-build-debug
+webserver/calculator/CMakeLists.txt
