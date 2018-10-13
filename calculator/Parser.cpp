@@ -59,7 +59,8 @@ void Parser::tokenize(const std::string input) {
 
 // Function to convert queue of tokens into postfix (RPN) string.
 void Parser::infixToPostfix() {
-    boost::variant<double,char> token;
+    variant<double,char> token;
+    variant<double,char> prev;
     bool isNegative = false;
     // Increment tokens queue until empty.
     while (!tokens.empty()) {
@@ -67,32 +68,43 @@ void Parser::infixToPostfix() {
         // If the scanned character is an operand, add it to output queue.
         if (token.type() == typeid(double)) {
             if (isNegative) {
-                token = boost::get<double>(token) * -1;
+                token = get<double>(token) * -1;
                 isNegative = false;
             }
             postfix.enqueue(token);
         }
         // If the scanned character is an ‘(‘, push it to the operator stack.
-        else if (boost::get<char>(token) == '(') { // TODO ISSUE IS HERE WITH NEGATIVE
-            if (tokens.peek().type() == typeid(char) && boost::get<char>(tokens.peek()) == '-') {
-                isNegative = true;
-            }
-            operators.push(boost::get<char>(token));
+        else if (get<char>(token) == '(') { 
+            operators.push(get<char>(token));
         }
         // If the scanned character is an ‘)’, pop to output string from the stack until an ‘(‘ is encountered.
-        else if (boost::get<char>(token) == ')') {
+        else if (get<char>(token) == ')') {
             while (operators.peek() != '(')
                 postfix.enqueue(operators.pop());
             operators.pop();
         }
         // If an operator is scanned
-        else if (isOperator(boost::get<char>(token))) {
-            // Check for operator precedence and add operators to output queue accordingly.
-            while (!operators.empty() && operators.peek() != '(' && (prec(boost::get<char>(token)) <= prec(operators.peek())) ) {
-                postfix.enqueue(operators.pop());
+        else if (isOperator(get<char>(token))) {
+            // Special case for negatives. TODO ISSUE IS HERE WITH NEGATIVE I THINK I FIXED IT
+            if (prev.type() == typeid(char)) {
+                if (get<char>(token) == '-' && get<char>(prev) == '(')
+                    isNegative = true;
+                else {
+                    // Check for operator precedence and add operators to output queue accordingly.
+                    while (!operators.empty() && operators.peek() != '(' && (prec(get<char>(token)) <= prec(operators.peek()))) {
+                        postfix.enqueue(operators.pop());
+                    }
+                    operators.push(get<char>(token));
+                }
+            } else {
+                // Check for operator precedence and add operators to output queue accordingly.
+                while (!operators.empty() && operators.peek() != '(' && (prec(get<char>(token)) <= prec(operators.peek()))) {
+                    postfix.enqueue(operators.pop());
+                }
+                operators.push(get<char>(token));
             }
-            operators.push(boost::get<char>(token));
         }
+        prev = token;
     }
     //Pop all the remaining elements from the stack
     while (!operators.empty()) {
@@ -103,21 +115,21 @@ void Parser::infixToPostfix() {
 
 // Function to evaluate Postfix expression (string) and return output.
 double Parser::evaluatePostfix() {
-    boost::variant<double,char> token;
+    variant<double,char> token;
     // Increment postfix queue until empty.
     while (!postfix.empty()) {
         token = postfix.dequeue();
         // If character is an operand, push to operand stack;
         if (token.type() == typeid(double)) {
-            operands.push(boost::get<double>(token));
+            operands.push(get<double>(token));
         }
         // If character is operator, pop two elements from stack, perform operation and push the result back.
-        else if (isOperator(boost::get<char>(token))) {
+        else if (isOperator(get<char>(token))) {
             // Pop two operands.
             double operand2 = operands.pop();
             double operand1 = operands.pop();
             // Perform operation
-            double result = performOperation(boost::get<char>(token), operand1, operand2);
+            double result = performOperation(get<char>(token), operand1, operand2);
             //Push back result of operation on stack.
             operands.push(result);
         }

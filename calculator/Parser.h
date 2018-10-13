@@ -8,11 +8,12 @@
 #include <cmath>
 #include <map>
 #include <boost/variant.hpp>
-#include <boost/lexical_cast.hpp>
 #include "Queue.h"
 #include "Stack.h"
-
 enum EXPRESSION_ERRORS {EMPTY_EXP, BAD_EXP};
+
+using boost::get;
+using boost::variant;
 
 class Parser {
 public:
@@ -41,8 +42,8 @@ public:
 
 private:
     // Private containers.
-    Queue<boost::variant<double,char>> tokens;
-    Queue<boost::variant<double,char>> postfix;
+    Queue<variant<double,char>> tokens;
+    Queue<variant<double,char>> postfix;
     Stack<double> operands;
     Stack<char> operators;
 //    std::map<char,double> memories;
