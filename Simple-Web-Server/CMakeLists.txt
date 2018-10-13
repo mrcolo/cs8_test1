@@ -14,8 +14,8 @@ endif()
 add_library(simple-web-server INTERFACE)
 
 target_include_directories(simple-web-server INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
-
 find_package(Threads REQUIRED)
+include_directories(${PROJECT_SOURCE_DIR}/calculator)
 target_link_libraries(simple-web-server INTERFACE ${CMAKE_THREAD_LIBS_INIT})
 
 # TODO 2020 when Debian Jessie LTS ends:
@@ -67,11 +67,11 @@ if("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_CURRENT_SOURCE_DIR}")
     endif()
     
     set(BUILD_TESTING ON)
-    
     install(FILES server_http.hpp client_http.hpp server_https.hpp client_https.hpp crypto.hpp utility.hpp status_code.hpp DESTINATION include/simple-web-server)
 endif()
-
+include_directories(${PROJECT_SOURCE_DIR}/calculator)
 if(BUILD_TESTING)
     enable_testing()
     add_subdirectory(tests)
+
 endif()

@@ -22,6 +22,12 @@ Parser& Parser::operator=(const Parser &other) {
     return *this;
 }
 
+double Parser::evaluate_exp(std::string input){
+    tokenize(input);
+    infixToPostfix();
+    return evaluatePostfix();
+}
+
 // Function to take input expression (string) and convert into tokens for queue.
 void Parser::tokenize(const std::string input) {
     if (!isValid(input))

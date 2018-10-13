@@ -175,7 +175,6 @@ void Calculator::importSession(string s){
     string line;
 
     while(getline(ss,line)){
-        cout<<"LINE: "<<line.substr(5, s.length())<<endl;
         exp_action.push(string_to_action(line.substr(0,4)));
         exp_values.push(line.substr(5, s.length()));
     }

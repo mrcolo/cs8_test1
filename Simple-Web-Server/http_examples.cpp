@@ -1,6 +1,7 @@
 #include "client_http.hpp"
 #include "server_http.hpp"
-
+#include "Calculator.h"
+#include "Calculator.cpp"
 // Added for the json-example
 #define BOOST_SPIRIT_THREADSAFE
 #include <boost/property_tree/json_parser.hpp>
@@ -24,26 +25,24 @@ using HttpServer = SimpleWeb::Server<SimpleWeb::HTTP>;
 int main() {
 
   HttpServer server;
+  Calculator c;
   server.config.port = 8080;
 
     //Gets a string as an input, and returns the evaluation
   server.resource["^/getresult$"]["POST"] = [](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
     // Retrieve string from request:
     auto content = request->content.string();
-    //Responses work as streams
 
-    //calculator.evaluate(request->content.string())
     *response << "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Length: " << content.length() << "\r\n\r\n"
               << content;
   };
 
-    server.resource["^/addvar$"]["POST"] = [](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
+    server.resource["^/addvar$"]["POST"] = [&c](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
 
         //Take the string from request
-        auto content = request->content.string();
+        c.addVar(request->content.string());
+        string content = "Added New Variable!";
 
-        //auto content = calculator.addVar(content)
-        //we can return a bool and send it as a JSON to cover exceptions.
         *response << "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Length: " << content.length() << "\r\n\r\n"
                   << content;
 
@@ -85,13 +84,12 @@ int main() {
 
     };
 
-    server.resource["^/getvar$"]["GET"] = [](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
-
+    server.resource["^/getvar$"]["GET"] = [&c](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
 
         //returns a string in JSON style with all the variables.
         //auto content = calculator.getVars();
 
-        auto content = request->content.string();
+        string content = c.getVars();
         *response << "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Length: " << content.length() << "\r\n\r\n"
                   << content;
 
