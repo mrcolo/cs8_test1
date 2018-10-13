@@ -2,18 +2,21 @@ import React, { Component } from 'react';
 import logo from './assets/logo.png';
 import './App.css';
 import 'semantic-ui-css/semantic.min.css';
-import {Input, Image, Header, Button, List, Icon} from 'semantic-ui-react'
+import {Input, Image, Header, Button, List, Icon, Modal} from 'semantic-ui-react'
 
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
       expression: '',
+      value: '',
       isVariable: false,
       isDelete: false,
       isExport: false,
       isExiting: false,
-      current_var:''
+      isModalOpen: false,
+      current_var:'',
+      vars: []
     };
   }
 
@@ -25,11 +28,30 @@ class App extends Component {
     alert("Now deleted expression in memory")
   }
 
-  handleGetVar = () => {
+  handleGetVar = async () => {
+    const nGROKendpoint = 'http://127.0.0.1:8080/getvar';
+    const rawResponse = await fetch(nGROKendpoint,
+      { method: 'POST',
+	      headers: { 'content-type': 'text/plain' }
+      }
+    );
 
-    console.log("Getting expressions...")
+    const myJSON = JSON.parse(await rawResponse.text())
+    this.setState({
+      vars: await myJSON
+    });
+    console.log(this.state.vars);
 
   }
+
+  handleOpenModal = async () => {
+    const { isModalOpen } = this.state;
+    await this.handleGetVar();
+    this.setState({
+        isModalOpen: !isModalOpen
+    });
+  }
+
 
   handleChange = async (e,data) => {
     const nGROKendpoint = 'http://127.0.0.1:8080/getresult';
@@ -39,8 +61,10 @@ class App extends Component {
       }
       );
 
+    const myJSON = JSON.parse(await rawResponse.text())
     this.setState({
-      expression: await rawResponse.text()
+      value: myJSON.expression ? myJSON.value : "",
+      expression: data.value
     });
 
     this.checkInput();
@@ -133,13 +157,36 @@ class App extends Component {
   }
 
   render() {
-    const { isVariable, isDelete, isExport, isImport, isExiting, expression }  = this.state;
+    const { isVariable, isDelete, isExport, isImport, isExiting, expression, value, isModalOpen, vars }  = this.state;
 
     return (
       <div className="App">
+        <Modal open={isModalOpen} basic size='small'>
+          <Header icon='calculator' content='Your Variables' />
+          <Modal.Content>
+            <List size="huge" className="results" selection>
+              {vars.map(variable => (
+                <List.Item onClick={() => { alert("put it in value") }}>
+                  <Header size="medium">
+                    {variable.expression}
+                  </Header>
+                  <List.Content>
+                    <List.Header as="a">{variable.value}</List.Header>
+                  </List.Content>
+                </List.Item>
+              ))}
+            </List>
+          </Modal.Content>
+          <Modal.Actions>
+            <Button onClick={this.handleOpenModal} basic color='red'>
+              <Icon name='back' /> Back
+            </Button>
+          </Modal.Actions>
+        </Modal>
+
         <header className="App-header">
           <div style={{paddingTop: 100, paddingBottom: 300}}>
-            <Image size='small' centered src={logo} className="App-logo" alt="logo" />
+            <Image onClick={this.handleOpenModal} size='small' centered src={logo} className="App-logo" alt="logo" />
             <p style={{paddingTop: 30, paddingBottom: 30}}>
             <code>Input an algebraic expression.</code>
           </p>
@@ -185,7 +232,7 @@ class App extends Component {
           }
             <Input label='exp' onChange={this.handleChange} fluid size="medium" icon='calculator' placeholder='Numbers go here...' />
             {expression.length === 0 &&
-              <div style={{paddingTop: 30}}>
+              <div style={{paddingTop: 20}}>
                 <List inverted size="small" animated verticalAlign='middle'>
                   <List.Item>
                     <Icon name='plus' size='large' />
@@ -221,7 +268,7 @@ class App extends Component {
               </div>
             }
             <Header style={{paddingTop: 80, color: 'white'}} size='huge'>
-              {expression}
+              {value}
             </Header>
 
         </div>

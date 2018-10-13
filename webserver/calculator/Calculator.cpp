@@ -81,6 +81,7 @@ bool Calculator::isValidVar(string s){
 string Calculator::evaluate(string s){
     cout<<"Evaluating "<<s<<"..."<<endl;
     double d;
+
     try {
         exp_action.push(EVAL);
         exp_values.push(s);
@@ -98,6 +99,14 @@ string Calculator::evaluate(string s){
             return ss.str();
         }
 
+    }
+    catch (STACK_ERRORS e) {
+        ptree temp;
+        temp.put<bool>("expression", false);
+        temp.put<double>("value",0);
+        stringstream ss;
+        write_json(ss, temp);
+        return ss.str();
     }
 
     ptree temp;

@@ -1,0 +1,24 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+..//status_code.hpp
+map
+-
+string
+-
+unordered_map
+-
+vector
+-
+
+/Users/francescocolonnese/Desktop/test/cs8_test1/webserver/tests/status_code_test.cpp
+status_code.hpp
+/Users/francescocolonnese/Desktop/test/cs8_test1/webserver/tests/status_code.hpp
+cassert
+-
+

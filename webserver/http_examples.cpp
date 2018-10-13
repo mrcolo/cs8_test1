@@ -86,12 +86,13 @@ int main() {
 
     };
 
-    server.resource["^/getvar$"]["GET"] = [&c](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
+    server.resource["^/getvar$"]["POST"] = [&c](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
 
         //returns a string in JSON style with all the variables.
         //auto content = calculator.getVars();
 
         string content = c.getVars();
+        cout<<c.getVars();
         *response << "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Length: " << content.length() << "\r\n\r\n"
                   << content;
 
