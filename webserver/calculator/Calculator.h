@@ -5,6 +5,7 @@
 #define CALCULATOR_H
 #include <iostream>
 #include <fstream>
+#include <vector>
 #include "Parser.h"
 #include "Stack.h"
 using namespace std;
@@ -26,8 +27,8 @@ public:
     void importSession(string s);
 
 private:
-    Stack<CALC_ACTIONS> exp_action = Stack<CALC_ACTIONS>(128);
-    Stack<string> exp_values = Stack<string>(128);
+    vector<CALC_ACTIONS> exp_action;
+    vector<string> exp_values;
     string* memory_exp;
     double* memory_val;
 
@@ -37,7 +38,7 @@ private:
 
     // Private functions.
     void nuke();
-    void runCommands(Stack<CALC_ACTIONS> s, Stack<string> s2);
+    void runCommands(vector<CALC_ACTIONS> s, vector<string> s2);
     bool isValidVar(string s);
     string action_to_string(CALC_ACTIONS c);
     CALC_ACTIONS string_to_action(string s);

@@ -18,8 +18,9 @@ Calculator::Calculator(){
     for (int i = 0; i < 26; ++i) {
         memory_exp[i] = "";
         memory_val[i] = 0;
-        exp_values[i] = "";
+        exp_values.push_back("");
     }
+
 
     m1.insert({EVAL, "EVAL"});
     m1.insert({ADDV,"ADDV"});
@@ -84,8 +85,8 @@ string Calculator::evaluate(string s){
     double d;
 
     try {
-        exp_action.push(EVAL);
-        exp_values.push(s);
+        exp_action.push_back(EVAL);
+        exp_values.push_back(s);
         p.tokenize(s);
         p.infixToPostfix();
         d = p.evaluatePostfix();
@@ -123,8 +124,8 @@ void Calculator::addVar(string s){
     if(!isValidVar(s))
         throw BAD_EXP;
 
-    exp_action.push(ADDV);
-    exp_values.push(s);
+    exp_action.push_back(ADDV);
+    exp_values.push_back(s);
 
     auto pos = s.find("=");
 
@@ -164,8 +165,8 @@ string Calculator::getVars(){
 void Calculator::delVar(string s){
 
     char c = s[s.find("clear") + 6];
-    exp_action.push(DELV);
-    exp_values.push(s);
+    exp_action.push_back(DELV);
+    exp_values.push_back(s);
 
     memory_val[toupper(c)-65] = 0;
     memory_exp[toupper(c)-65] = "";
@@ -182,7 +183,7 @@ CALC_ACTIONS Calculator::string_to_action(string s){
 string Calculator::exportSession(){
     string result = "";
 
-    for(int i = 0; i < exp_action.getSize(); i++){
+    for(int i = 0; i < exp_action.size(); i++){
         result += action_to_string(exp_action[i]);
         result += " ";
         result += exp_values[i];
@@ -203,15 +204,17 @@ void Calculator::importSession(string s){
     string line;
 
     while(getline(ss,line)){
-        exp_action.push(string_to_action(line.substr(0,4)));
-        exp_values.push(line.substr(5, s.length()));
+        exp_action.push_back(string_to_action(line.substr(0,4)));
+        exp_values.push_back(line.substr(5, s.length()));
     }
 
     runCommands(exp_action, exp_values);
 }
 
-void Calculator::runCommands(Stack<CALC_ACTIONS> s, Stack<string> s2){
-    for(int i = 0 ; i < s.getSize(); i++){
+void Calculator::runCommands(vector<CALC_ACTIONS> s, vector<string> s2){
+    for(int i = 0 ; i < s.size(); i++){
+        cout<<s[i]<<endl;
+
         switch(s[i]) {
             case EVAL:
                 evaluate(s2[i]);
