@@ -2,6 +2,7 @@
 webserver/calculator/cmake-build-debug/*
 webserver/calculator/.idea/workspace.xml
 webserver/cmake-build-debug/*
+webserver/.idea/*
 webserver/.idea/workspace.xml
 webserver/.idea/vcs.xml
 webserver/build/*
