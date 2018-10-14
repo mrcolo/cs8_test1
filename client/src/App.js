@@ -3,6 +3,7 @@ import logo from './assets/logo.png';
 import './App.css';
 import 'semantic-ui-css/semantic.min.css';
 import {Input, Image, Header, Button, List, Icon, Modal} from 'semantic-ui-react'
+import FileReaderInput from 'react-file-reader-input';
 
 class App extends Component {
   constructor(props) {
@@ -20,12 +21,40 @@ class App extends Component {
     };
   }
 
-  handleAddVar = () => {
+  handleAddVar = async () => {
+    const { expression } = this.state;
+    const nGROKendpoint = 'http://127.0.0.1:8080/addvar';
+    await fetch(nGROKendpoint,
+      { method: 'POST',
+        headers: { 'content-type': 'text/plain' },
+        body: expression
+      }
+    );
+
+    this.setState({
+      expression: ""
+    });
+
     alert("expression is now stored in memory location <M>")
+
   }
 
-  handleDelVar = () => {
-    alert("Now deleted expression in memory")
+  handleDelVar = async () => {
+    const { expression } = this.state;
+    const nGROKendpoint = 'http://127.0.0.1:8080/delvar';
+
+    await fetch(nGROKendpoint,
+      { method: 'POST',
+        headers: { 'content-type': 'text/plain' },
+        body: expression
+      }
+    );
+
+    this.setState({
+      expression: ""
+    });
+
+    alert("expression is now stored in memory location <M>")
   }
 
   handleGetVar = async () => {
@@ -37,11 +66,41 @@ class App extends Component {
     );
 
     const myJSON = JSON.parse(await rawResponse.text())
+    let temp = []
+    const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    for(let i = 0; i < 26; i++)
+      temp.push(myJSON[alphabet[i]])
     this.setState({
-      vars: await myJSON
+      vars: temp
     });
-    console.log(this.state.vars);
 
+    console.log(this.state.vars);
+  }
+  handleExport = async () => {
+    const nGROKendpoint = 'http://127.0.0.1:8080/export';
+    const rawResponse = await fetch(nGROKendpoint,
+      { method: 'POST',
+        headers: { 'content-type': 'text/plain' }
+      }
+    );
+
+    var element = document.createElement("a");
+    var file = new Blob([await rawResponse.text()], {type: 'text/plain'});
+    element.href = URL.createObjectURL(file);
+    element.download = "EXPORT_CALC.txt";
+    element.click();
+  }
+
+  handleImport = async (text) => {
+
+    const nGROKendpoint = 'http://127.0.0.1:8080/import';
+    await fetch(nGROKendpoint,
+      { method: 'POST',
+        headers: { 'content-type': 'text/plain' },
+        body: text
+      },
+    );
+    alert("Imported Settings.")
   }
 
   handleOpenModal = async () => {
@@ -156,30 +215,51 @@ class App extends Component {
     alert("I'm a web app! Just close the browser.")
   }
 
+  handleFileChange = (e, results) => {
+    results.forEach(result => {
+      const [file] = result;
+      var fr = new FileReader();
+
+      fr.onload = async (e) => {
+        const nGROKendpoint = 'http://127.0.0.1:8080/import';
+        await fetch(nGROKendpoint,
+          { method: 'POST',
+            headers: { 'content-type': 'text/plain' },
+            body: e.target.result
+          },
+        );
+        alert("Imported Settings.")
+      };
+
+      fr.readAsText(file);
+      });
+  }
+
   render() {
     const { isVariable, isDelete, isExport, isImport, isExiting, expression, value, isModalOpen, vars }  = this.state;
+    const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
     return (
       <div className="App">
-        <Modal open={isModalOpen} basic size='small'>
+        <Modal open={isModalOpen}  size='small'>
           <Header icon='calculator' content='Your Variables' />
           <Modal.Content>
             <List size="huge" className="results" selection>
-              {vars.map(variable => (
-                <List.Item onClick={() => { alert("put it in value") }}>
-                  <Header size="medium">
-                    {variable.expression}
-                  </Header>
+              {
+                vars.map((variable, index) => (
+                <List.Item>
                   <List.Content>
-                    <List.Header as="a">{variable.value}</List.Header>
+                    <List.Header inverted>{alphabet[index]}</List.Header>
+                    <p inverted>{variable.value !== "0" ? "expression: " + variable.expression : ""}</p>
+                    <p inverted>{variable.value !== "0" ? "value: " + variable.value : ""}</p>
                   </List.Content>
                 </List.Item>
               ))}
             </List>
           </Modal.Content>
           <Modal.Actions>
-            <Button onClick={this.handleOpenModal} basic color='red'>
-              <Icon name='back' /> Back
+            <Button onClick={this.handleOpenModal} color='red'>
+              <Icon name='x' /> Close
             </Button>
           </Modal.Actions>
         </Modal>
@@ -193,7 +273,7 @@ class App extends Component {
           {
             isVariable &&
             <div style={{paddingBottom: 20}}>
-            <Button size="big" fluid color='yellow'>
+            <Button onClick={this.handleAddVar} size="big" fluid color='yellow'>
               Add Variable
             </Button>
           </div>
@@ -201,7 +281,7 @@ class App extends Component {
           {
             isDelete &&
             <div style={{paddingBottom: 20}}>
-            <Button size="big" fluid color='red'>
+            <Button onClick={this.handleDelVar} size="big" fluid color='red'>
               Delete Variable
             </Button>
           </div>
@@ -209,7 +289,7 @@ class App extends Component {
           {
             isExport &&
             <div style={{paddingBottom: 20}}>
-            <Button size="big" fluid color='green'>
+            <Button onClick={this.handleExport} size="big" fluid color='green'>
               Export Session
             </Button>
           </div>
@@ -217,9 +297,14 @@ class App extends Component {
           {
             isImport &&
             <div style={{paddingBottom: 20}}>
-            <Button size="big" fluid color='blue'>
-              Import Session
-            </Button>
+              <FileReaderInput
+                as="text"
+                id="my-file-input"
+                onChange={this.handleFileChange}>
+                <Button size="big" fluid color='blue'>
+                  Import Session
+                </Button>
+              </FileReaderInput>
           </div>
           }
           {

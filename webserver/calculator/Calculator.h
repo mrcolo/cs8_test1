@@ -11,7 +11,7 @@ using namespace std;
 enum CALC_ACTIONS { ADDV, DELV, EVAL};
 
 class Calculator {
-    // Big bad calculator class that takes care of everything.
+
 public:
     Calculator();
     ~Calculator();
@@ -21,7 +21,7 @@ public:
     string evaluate(string s);
     void addVar(string s);
     string getVars();
-    void deleteVar(char c);
+    void delVar(string s);
     string exportSession();
     void importSession(string s);
 
@@ -37,6 +37,7 @@ private:
 
     // Private functions.
     void nuke();
+    void runCommands(Stack<CALC_ACTIONS> s, Stack<string> s2);
     bool isValidVar(string s);
     string action_to_string(CALC_ACTIONS c);
     CALC_ACTIONS string_to_action(string s);

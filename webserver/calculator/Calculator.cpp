@@ -11,6 +11,7 @@ using boost::property_tree::ptree;
 using boost::property_tree::read_json;
 using boost::property_tree::write_json;
 
+
 Calculator::Calculator(){
     memory_exp = new string[26];
     memory_val = new double[26];
@@ -132,8 +133,13 @@ void Calculator::addVar(string s){
     cout<<"Adding "<<sub_var<<"..."<<endl;
     memory_exp[sub_var-65] = s.substr(pos + 1,s.length());
 
-    //TODO FINISH WHEN ARMAN IS DONE
-    //memory_val[sub_var] = p.evaluate(sub_exp);
+    p.tokenize(memory_exp[sub_var-65]);
+    p.infixToPostfix();
+
+    double d;
+    d = p.evaluatePostfix();
+
+    memory_val[sub_var-65] = d;
 }
 
 string Calculator::getVars(){
@@ -155,10 +161,9 @@ string Calculator::getVars(){
     return ss.str();
 };
 
-void Calculator::deleteVar(char c){
+void Calculator::delVar(string s){
 
-    string s(1,c);
-
+    char c = s[s.find("clear") + 6];
     exp_action.push(DELV);
     exp_values.push(s);
 
@@ -200,5 +205,23 @@ void Calculator::importSession(string s){
     while(getline(ss,line)){
         exp_action.push(string_to_action(line.substr(0,4)));
         exp_values.push(line.substr(5, s.length()));
+    }
+
+    runCommands(exp_action, exp_values);
+}
+
+void Calculator::runCommands(Stack<CALC_ACTIONS> s, Stack<string> s2){
+    for(int i = 0 ; i < s.getSize(); i++){
+        switch(s[i]) {
+            case EVAL:
+                evaluate(s2[i]);
+                break;
+            case ADDV:
+                addVar(s2[i]);
+                break;
+            case DELV:
+                delVar(s2[i]);
+                break;
+        }
     }
 }
