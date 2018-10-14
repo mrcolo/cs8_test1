@@ -87,7 +87,7 @@ string Calculator::evaluate(string s){
     try {
         exp_action.push_back(EVAL);
         exp_values.push_back(s);
-        p.tokenize(s);
+        p.tokenize(s,memory_val);
         p.infixToPostfix();
         d = p.evaluatePostfix();
     }
@@ -134,7 +134,7 @@ void Calculator::addVar(string s){
     cout<<"Adding "<<sub_var<<"..."<<endl;
     memory_exp[sub_var-65] = s.substr(pos + 1,s.length());
 
-    p.tokenize(memory_exp[sub_var-65]);
+    p.tokenize(memory_exp[sub_var-65], memory_val);
     p.infixToPostfix();
 
     double d;

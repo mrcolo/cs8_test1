@@ -24,7 +24,7 @@ public:
     Parser& operator=(const Parser &other);
 
     // Class functions.
-    void tokenize(std::string input);
+    void tokenize(std::string input, double* memory_val);
     void infixToPostfix();
     double evaluatePostfix();
     double performOperation(char operation, double operand1, double operand2);
@@ -46,7 +46,6 @@ private:
     Queue<variant<double,char>> postfix;
     Stack<double> operands;
     Stack<char> operators;
-//    std::map<char,double> memories;
 
     // Private functions.
     void nuke();

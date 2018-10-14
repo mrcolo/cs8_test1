@@ -43,6 +43,8 @@ private:
     string action_to_string(CALC_ACTIONS c);
     CALC_ACTIONS string_to_action(string s);
     void copy(const Calculator &other);
+
+    friend class Parser;
 };
 
 #endif //CALCULATOR_H

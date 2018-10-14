@@ -23,7 +23,7 @@ Parser& Parser::operator=(const Parser &other) {
 }
 
 // Function to take input expression (string) and convert into tokens for queue.
-void Parser::tokenize(const std::string input) {
+void Parser::tokenize(const std::string input, double* memory_val) {
     if (!isValid(input))
         throw BAD_EXP;
     int j = 0;
@@ -40,8 +40,9 @@ void Parser::tokenize(const std::string input) {
             tokens.enqueue(input[i]);
         }
         // If character is a letter (A-Z), grab memory value and add to token queue.
-        if (isLetter(input[i])) {  // TODO "HAS_VALUE" BOOL CHECKER
-//            tokens.enqueue(memories[i]);
+        if (isLetter(input[i])) {
+
+            tokens.enqueue(memory_val[toupper(input[i])-65]);
         }
         // If character is a number, check for decimal and add double to token queue.
         else if (isDigit(input[i]) || input[i] == '.') {
