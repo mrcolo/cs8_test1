@@ -217,7 +217,7 @@ class App extends Component {
 
   handleFileChange = (e, results) => {
     results.forEach(result => {
-      const [file] = result;
+      const [e,file] = result;
       var fr = new FileReader();
 
       fr.onload = async (e) => {
