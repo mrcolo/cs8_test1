@@ -83,15 +83,12 @@ bool Calculator::isValidVar(string s){
 string Calculator::evaluate(string s){
     cout<<"Evaluating "<<s<<"..."<<endl;
     double d = 0;
-    cout<<"MYSTRING: "<<s<<endl;
     try {
-        exp_action.push_back(EVAL);
-        exp_values.push_back(s);
-        for(int i = 0; i < exp_values.size(); i++)
-            cout<<exp_values[i]<<endl;
         p.tokenize(s,memory_val);
         p.infixToPostfix();
         d = p.evaluatePostfix();
+        exp_action.push_back(EVAL);
+        exp_values.push_back(s);
     }
     catch (EXPRESSION_ERRORS e) {
         if (e){
@@ -228,7 +225,6 @@ void Calculator::importSession(string s){
 
 void Calculator::runCommands(vector<CALC_ACTIONS> s, vector<string> s2){
     for(unsigned int i = 0 ; i < s.size(); i++){
-        cout<<s[i]<<endl;
         if(s2[i].length() != 0)
             switch(s[i]) {
                 case EVAL:
