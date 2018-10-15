@@ -120,28 +120,33 @@ string Calculator::evaluate(string s){
 }
 
 void Calculator::addVar(string s){
+    try {
+        if (!isValidVar(s))
+            throw BAD_EXP;
 
-    if(!isValidVar(s))
-        throw BAD_EXP;
+        exp_action.push_back(ADDV);
+        exp_values.push_back(s);
 
-    exp_action.push_back(ADDV);
-    exp_values.push_back(s);
+        auto pos = s.find("=");
 
-    auto pos = s.find("=");
+        //TODO this is not efficient, it should get the function in isvalid.
+        auto sub_var = static_cast<char>(toupper(s[0]));
 
-    //TODO this is not efficient, it should get the function in isvalid.
-    auto sub_var = static_cast<char>(toupper(s[0]));
+        cout << "Adding " << sub_var << "..." << endl;
+        memory_exp[sub_var - 65] = s.substr(pos + 1, s.length());
 
-    cout<<"Adding "<<sub_var<<"..."<<endl;
-    memory_exp[sub_var-65] = s.substr(pos + 1,s.length());
+        p.tokenize(memory_exp[sub_var - 65], memory_val);
+        p.infixToPostfix();
 
-    p.tokenize(memory_exp[sub_var-65], memory_val);
-    p.infixToPostfix();
+        double d;
+        d = p.evaluatePostfix();
 
-    double d;
-    d = p.evaluatePostfix();
+        memory_val[sub_var - 65] = d;
+    }
+    catch(EXPRESSION_ERRORS e) {
+        cout<<"Expression error occurred"<<endl;
+    }
 
-    memory_val[sub_var-65] = d;
 }
 
 string Calculator::getVars(){
