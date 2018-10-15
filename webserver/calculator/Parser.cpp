@@ -27,6 +27,10 @@ Parser& Parser::operator=(const Parser &other) {
 
 // Function to take input expression (string) and convert into tokens for queue.
 void Parser::tokenize(const std::string input, double* memory_val) {
+    tokens.clear();
+    postfix.clear();
+    operands.clear();
+    operators.clear();
     if (!isValid(input))
         throw BAD_EXP;
     int j = 0;
@@ -148,13 +152,8 @@ double Parser::evaluatePostfix() {
             operands.push(result);
         }
     }
-    double d = operands.pop();
-    tokens.clear();
-    postfix.clear();
-    operands.clear();
-    operators.clear();
     // If input is in correct format, operand stack will have one element. This will be the output.
-    return d;
+    return operands.pop();;
 }
 
 double add(double operand1, double operand2) {
