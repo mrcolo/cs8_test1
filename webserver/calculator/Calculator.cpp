@@ -162,7 +162,7 @@ string Calculator::getVars(){
     ptree arr;
     string alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-    for (int i = 0; i < 26; ++i) {
+    for (unsigned int i = 0; i < 26; ++i) {
         ptree temp;
         temp.put<string>("expression", memory_exp[i]);
         temp.put<double>("value", memory_val[i]);
@@ -197,7 +197,7 @@ CALC_ACTIONS Calculator::string_to_action(string s){
 string Calculator::exportSession(){
     string result;
 
-    for(int i = 0; i < exp_action.size(); i++){
+    for(unsigned int i = 0; i < exp_action.size(); i++){
         result += action_to_string(exp_action[i]);
         result += " ";
         result += exp_values[i];

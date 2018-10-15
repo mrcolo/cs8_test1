@@ -31,7 +31,7 @@ void Parser::tokenize(const std::string input, double* memory_val) {
         throw BAD_EXP;
     int j = 0;
     // Increment input until the end.
-    for (int i = 0; i < input.length(); ++i, ++j) {
+    for (unsigned int i = 0; i < input.length(); ++i, ++j) {
         if (tokens.full())
             throw QFULL;
         // If character is a delimiter, move on.
@@ -151,6 +151,8 @@ double Parser::evaluatePostfix() {
     double d = operands.pop();
     tokens.clear();
     postfix.clear();
+    operands.clear();
+    operators.clear();
     // If input is in correct format, operand stack will have one element. This will be the output.
     return d;
 }

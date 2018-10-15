@@ -22,6 +22,7 @@ public:
     int getCapacity() const;
     int roomLeft() const;
     void resize(int s);
+    void clear();
     void push(const T &data);
     T pop();
     T peek();
@@ -121,6 +122,11 @@ void Stack<T>::resize(int s) {
         delete [] stack;
         stack = tempStack;
     }
+}
+
+template<typename T>
+void Stack<T>::clear() {
+    mySize = 0;
 }
 
 template<typename T>
