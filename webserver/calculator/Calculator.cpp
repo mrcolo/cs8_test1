@@ -19,7 +19,6 @@ Calculator::Calculator(){
     for (int i = 0; i < 26; ++i) {
         memory_exp[i] = "";
         memory_val[i] = 0;
-        exp_values.emplace_back("");
     }
 
 
@@ -84,10 +83,12 @@ bool Calculator::isValidVar(string s){
 string Calculator::evaluate(string s){
     cout<<"Evaluating "<<s<<"..."<<endl;
     double d = 0;
-
+    cout<<"MYSTRING: "<<s<<endl;
     try {
         exp_action.push_back(EVAL);
         exp_values.push_back(s);
+        for(int i = 0; i < exp_values.size(); i++)
+            cout<<exp_values[i]<<endl;
         p.tokenize(s,memory_val);
         p.infixToPostfix();
         d = p.evaluatePostfix();
@@ -131,10 +132,10 @@ void Calculator::addVar(string s){
     try {
         if (!isValidVar(s))
             throw BAD_EXP;
-
-        exp_action.push_back(ADDV);
-        exp_values.push_back(s);
-
+        else{
+            exp_action.push_back(ADDV);
+            exp_values.push_back(s);
+        }
         auto pos = s.find('=');
 
         //TODO this is not efficient, it should get the function in isvalid.
