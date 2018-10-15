@@ -15,6 +15,7 @@ using boost::property_tree::write_json;
 Calculator::Calculator(){
     memory_exp = new string[26];
     memory_val = new double[26];
+
     for (int i = 0; i < 26; ++i) {
         memory_exp[i] = "";
         memory_val[i] = 0;
@@ -100,7 +101,6 @@ string Calculator::evaluate(string s){
             write_json(ss, temp);
             return ss.str();
         }
-
     }
     catch (STACK_ERRORS e) {
         ptree temp;
@@ -129,6 +129,7 @@ void Calculator::addVar(string s){
 
     auto pos = s.find("=");
 
+    //TODO this is not efficient, it should get the function in isvalid.
     auto sub_var = static_cast<char>(toupper(s[0]));
 
     cout<<"Adding "<<sub_var<<"..."<<endl;
@@ -214,17 +215,17 @@ void Calculator::importSession(string s){
 void Calculator::runCommands(vector<CALC_ACTIONS> s, vector<string> s2){
     for(int i = 0 ; i < s.size(); i++){
         cout<<s[i]<<endl;
-
-        switch(s[i]) {
-            case EVAL:
-                evaluate(s2[i]);
-                break;
-            case ADDV:
-                addVar(s2[i]);
-                break;
-            case DELV:
-                delVar(s2[i]);
-                break;
-        }
+        if(s2[i].length() != 0)
+            switch(s[i]) {
+                case EVAL:
+                    evaluate(s2[i]);
+                    break;
+                case ADDV:
+                    addVar(s2[i]);
+                    break;
+                case DELV:
+                    delVar(s2[i]);
+                    break;
+            }
     }
 }

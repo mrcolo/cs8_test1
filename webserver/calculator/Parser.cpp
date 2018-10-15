@@ -2,8 +2,11 @@
 // Created by Arman Mansourian on 10/10/18.
 //
 #include "Parser.h"
+struct perform {
+    typedef double (*operation)(double, double);
+};
 
-// NEED TO WRITE
+//TODO NEED TO WRITE
 Parser::Parser() = default;
 
 Parser::~Parser() {
@@ -67,43 +70,53 @@ void Parser::infixToPostfix() {
     while (!tokens.empty()) {
         token = tokens.dequeue();
         // If the scanned character is an operand, add it to output queue.
-        if (token.type() == typeid(double)) {
-            if (isNegative) {
-                token = get<double>(token) * -1;
-                isNegative = false;
+        try {
+            if (token.type() == typeid(double)) {
+                if (isNegative) {
+                    token = get<double>(token) * -1;
+                    isNegative = false;
+                }
+                postfix.enqueue(token);
             }
-            postfix.enqueue(token);
-        }
-        // If the scanned character is an ‘(‘, push it to the operator stack.
-        else if (get<char>(token) == '(') { 
-            operators.push(get<char>(token));
-        }
-        // If the scanned character is an ‘)’, pop to output string from the stack until an ‘(‘ is encountered.
-        else if (get<char>(token) == ')') {
-            while (operators.peek() != '(')
-                postfix.enqueue(operators.pop());
-            operators.pop();
-        }
-        // If an operator is scanned
-        else if (isOperator(get<char>(token))) {
-            // Special case for negatives. TODO ISSUE IS HERE WITH NEGATIVE I THINK I FIXED IT
-            if (prev.type() == typeid(char)) {
-                if (get<char>(token) == '-' && get<char>(prev) == '(')
-                    isNegative = true;
-                else {
+                // If the scanned character is an ‘(‘, push it to the operator stack.
+            else if (get<char>(token) == '(') {
+                operators.push(get<char>(token));
+            }
+                // If the scanned character is an ‘)’, pop to output string from the stack until an ‘(‘ is encountered.
+            else if (get<char>(token) == ')') {
+                while (operators.peek() != '(')
+                    postfix.enqueue(operators.pop());
+                operators.pop();
+            }
+                // If an operator is scanned
+            else if (isOperator(get<char>(token))) {
+                // Special case for negatives. TODO ISSUE IS HERE WITH NEGATIVE I THINK I FIXED IT
+                if (prev.type() == typeid(char)) {
+                    if (get<char>(token) == '-' && get<char>(prev) == '(')
+                        isNegative = true;
+                    else {
+                        // Check for operator precedence and add operators to output queue accordingly.
+                        while (!operators.empty() && operators.peek() != '(' &&
+                               (prec(get<char>(token)) <= prec(operators.peek()))) {
+                            postfix.enqueue(operators.pop());
+                        }
+                        operators.push(get<char>(token));
+                    }
+                } else {
                     // Check for operator precedence and add operators to output queue accordingly.
-                    while (!operators.empty() && operators.peek() != '(' && (prec(get<char>(token)) <= prec(operators.peek()))) {
+                    while (!operators.empty() && operators.peek() != '(' &&
+                           (prec(get<char>(token)) <= prec(operators.peek()))) {
                         postfix.enqueue(operators.pop());
                     }
                     operators.push(get<char>(token));
                 }
-            } else {
-                // Check for operator precedence and add operators to output queue accordingly.
-                while (!operators.empty() && operators.peek() != '(' && (prec(get<char>(token)) <= prec(operators.peek()))) {
-                    postfix.enqueue(operators.pop());
-                }
-                operators.push(get<char>(token));
             }
+        }
+        catch(STACK_ERRORS e){
+            cout << e <<endl;
+        }
+        catch(QUEUE_ERRORS e){
+            cout << e <<endl;
         }
         prev = token;
     }
@@ -135,28 +148,132 @@ double Parser::evaluatePostfix() {
             operands.push(result);
         }
     }
+    double d = operands.pop();
+    tokens.clear();
+    postfix.clear();
     // If input is in correct format, operand stack will have one element. This will be the output.
-    return operands.pop();
+    return d;
 }
 
-// TODO FPTR IMPLEMENTATION
+double add(double operand1, double operand2) {
+    try {
+        return operand1 + operand2;
+    }
+    catch(const std::runtime_error& re)
+    {
+        // speciffic handling for runtime_error
+        std::cerr << "Runtime error: " << re.what() << std::endl;
+    }
+    catch(const std::exception& ex)
+    {
+        // speciffic handling for all exceptions extending std::exception, except
+        // std::runtime_error which is handled explicitly
+        std::cerr << "Error occurred: " << ex.what() << std::endl;
+    }
+    catch(...)
+    {
+        // catch any other errors (that we have no information about)
+        std::cerr << "Unknown failure occurred. Possible memory corruption" << std::endl;
+    }
+}
+double sub(double operand1, double operand2) {
+    try {
+        return operand1 - operand2;
+    }
+    catch(const std::runtime_error& re)
+    {
+        // speciffic handling for runtime_error
+        std::cerr << "Runtime error: " << re.what() << std::endl;
+    }
+    catch(const std::exception& ex)
+    {
+        // speciffic handling for all exceptions extending std::exception, except
+        // std::runtime_error which is handled explicitly
+        std::cerr << "Error occurred: " << ex.what() << std::endl;
+    }
+    catch(...)
+    {
+        // catch any other errors (that we have no information about)
+        std::cerr << "Unknown failure occurred. Possible memory corruption" << std::endl;
+    }
+}
+
+double multiply(double operand1, double operand2) {
+    try {
+        return operand1 * operand2;
+    }
+    catch(const std::runtime_error& re)
+    {
+        // speciffic handling for runtime_error
+        std::cerr << "Runtime error: " << re.what() << std::endl;
+    }
+    catch(const std::exception& ex)
+    {
+        // speciffic handling for all exceptions extending std::exception, except
+        // std::runtime_error which is handled explicitly
+        std::cerr << "Error occurred: " << ex.what() << std::endl;
+    }
+    catch(...)
+    {
+        // catch any other errors (that we have no information about)
+        std::cerr << "Unknown failure occurred. Possible memory corruption" << std::endl;
+    }
+}
+
+double divide(double operand1, double operand2) {
+    try {
+        return operand1 / operand2;
+    }
+    catch(const std::runtime_error& re)
+    {
+        // speciffic handling for runtime_error
+        std::cerr << "Runtime error: " << re.what() << std::endl;
+    }
+    catch(const std::exception& ex)
+    {
+        // speciffic handling for all exceptions extending std::exception, except
+        // std::runtime_error which is handled explicitly
+        std::cerr << "Error occurred: " << ex.what() << std::endl;
+    }
+    catch(...)
+    {
+        // catch any other errors (that we have no information about)
+        std::cerr << "Unknown failure occurred. Possible memory corruption" << std::endl;
+    }
+}
+
+double exp(double operand1, double operand2) {
+    try {
+        return pow(operand1, operand2);
+    }
+    catch(const std::runtime_error& re)
+    {
+        // speciffic handling for runtime_error
+        std::cerr << "Runtime error: " << re.what() << std::endl;
+    }
+    catch(const std::exception& ex)
+    {
+        // speciffic handling for all exceptions extending std::exception, except
+        // std::runtime_error which is handled explicitly
+        std::cerr << "Error occurred: " << ex.what() << std::endl;
+    }
+    catch(...)
+    {
+        // catch any other errors (that we have no information about)
+        std::cerr << "Unknown failure occurred. Possible memory corruption" << std::endl;
+    }
+}
 // Function to perform an operation and return output.
 double Parser::performOperation(char operation, double operand1, double operand2) {
-    switch (operation) {
-        case '+':
-            return operand1 + operand2;
-        case '-':
-            return operand1 - operand2;
-        case '*':
-            return operand1 * operand2;
-        case '/':
-            return operand1 / operand2;
-        case '^':
-            return pow(operand1, operand2);
-        default:
-            std::cout << "Unexpected Error in performOperation()!";
-            return -1;
-    }
+    perform::operation os [128];
+
+    os['+'] = &add;
+    os['-'] = &sub;
+    os['*'] = &multiply;
+    os['/'] = &divide;
+    os['^'] = &exp;
+
+    return os[operation](operand1, operand2);
 }
 
 // TODO WRITE ISVALID FUNCTION IN CALCULATOR CLASS
