@@ -35,7 +35,7 @@ class App extends Component {
       expression: ""
     });
 
-    alert("expression is now stored in memory location <M>")
+    alert("Expression is now stored in memory.")
 
   }
 
@@ -54,7 +54,7 @@ class App extends Component {
       expression: ""
     });
 
-    alert("expression is now stored in memory location <M>")
+    alert("Expression was deleted.")
   }
 
   handleGetVar = async () => {
@@ -114,9 +114,16 @@ class App extends Component {
 
   handleChange = async (e,data) => {
     const nGROKendpoint = 'http://127.0.0.1:8080/getresult';
+    let temp = data.value;
+    let resultString = "";
+    if(temp.includes("="))
+      resultString = temp.substr(temp.indexOf("="), temp.length - temp.indexOf("=") )
+    else {
+      resultString = data.value;
+    }
     const rawResponse = await fetch(nGROKendpoint, { method: 'POST',
 	headers: { 'content-type': 'text/plain' },
-        body: data.value
+        body: resultString
       }
       );
 
