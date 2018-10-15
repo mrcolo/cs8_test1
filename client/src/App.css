@@ -27,12 +27,12 @@
         transform: rotate(xx) scale(0.9);
         }
     25%{
-        transform: rotate(xx) scale(0.92);
+        transform: rotate(xx) scale(0.98);
         }
     50%{
-        transform: scale(0.95);
+        transform: scale(1.05);
         }
     100%{
-        transform: rotate(xx) scale(1);
+        transform: rotate(xx) scale(1.10);
         }
 }

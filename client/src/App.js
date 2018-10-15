@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import logo from './assets/logo.png';
 import './App.css';
 import 'semantic-ui-css/semantic.min.css';
-import {Input, Image, Header, Button, List, Icon, Modal} from 'semantic-ui-react'
+import {Input, Image, Header, Button, List, Icon, Modal, Popup} from 'semantic-ui-react'
 import FileReaderInput from 'react-file-reader-input';
 
 class App extends Component {
@@ -273,7 +273,8 @@ class App extends Component {
 
         <header className="App-header">
           <div style={{paddingTop: 100, paddingBottom: 300}}>
-            <Image onClick={this.handleOpenModal} size='small' centered src={logo} className="App-logo" alt="logo" />
+              <Popup trigger={<Image onClick={this.handleOpenModal} size='small' centered src={logo} className="App-logo" alt="logo" />
+} content='Click on the flower to display variables.' position='top center' />
             <p style={{paddingTop: 30, paddingBottom: 30}}>
             <code>Input an algebraic expression.</code>
           </p>
