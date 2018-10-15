@@ -113,10 +113,10 @@ void Parser::infixToPostfix() {
             }
         }
         catch(STACK_ERRORS e){
-            cout << e <<endl;
+            std::cout << e << std::endl;
         }
         catch(QUEUE_ERRORS e){
-            cout << e <<endl;
+            std::cout << e << std::endl;
         }
         prev = token;
     }

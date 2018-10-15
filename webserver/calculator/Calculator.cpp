@@ -19,7 +19,7 @@ Calculator::Calculator(){
     for (int i = 0; i < 26; ++i) {
         memory_exp[i] = "";
         memory_val[i] = 0;
-        exp_values.push_back("");
+        exp_values.emplace_back("");
     }
 
 
@@ -83,7 +83,7 @@ bool Calculator::isValidVar(string s){
 
 string Calculator::evaluate(string s){
     cout<<"Evaluating "<<s<<"..."<<endl;
-    double d;
+    double d = 0;
 
     try {
         exp_action.push_back(EVAL);
@@ -110,6 +110,14 @@ string Calculator::evaluate(string s){
         write_json(ss, temp);
         return ss.str();
     }
+    catch (QUEUE_ERRORS e) {
+        ptree temp;
+        temp.put<bool>("expression", false);
+        temp.put<double>("value",0);
+        stringstream ss;
+        write_json(ss, temp);
+        return ss.str();
+    }
 
     ptree temp;
     temp.put<bool>("expression", true);
@@ -127,7 +135,7 @@ void Calculator::addVar(string s){
         exp_action.push_back(ADDV);
         exp_values.push_back(s);
 
-        auto pos = s.find("=");
+        auto pos = s.find('=');
 
         //TODO this is not efficient, it should get the function in isvalid.
         auto sub_var = static_cast<char>(toupper(s[0]));
@@ -187,7 +195,7 @@ CALC_ACTIONS Calculator::string_to_action(string s){
 }
 
 string Calculator::exportSession(){
-    string result = "";
+    string result;
 
     for(int i = 0; i < exp_action.size(); i++){
         result += action_to_string(exp_action[i]);
@@ -218,7 +226,7 @@ void Calculator::importSession(string s){
 }
 
 void Calculator::runCommands(vector<CALC_ACTIONS> s, vector<string> s2){
-    for(int i = 0 ; i < s.size(); i++){
+    for(unsigned int i = 0 ; i < s.size(); i++){
         cout<<s[i]<<endl;
         if(s2[i].length() != 0)
             switch(s[i]) {
