@@ -16,6 +16,7 @@ class App extends Component {
       isExport: false,
       isExiting: false,
       isModalOpen: false,
+      isCompleteDelete: false,
       current_var:'',
       vars: []
     };
@@ -37,6 +38,21 @@ class App extends Component {
 
     alert("Expression is now stored in memory.")
 
+  }
+
+  handleCompleteDel = async () => {
+    const nGROKendpoint = 'http://127.0.0.1:8080/delall';
+    await fetch(nGROKendpoint,
+      { method: 'POST',
+        headers: { 'content-type': 'text/plain' },
+      }
+    );
+
+    this.setState({
+      expression: ""
+    });
+
+    alert("Deleted all expressions.")
   }
 
   handleDelVar = async () => {
@@ -73,9 +89,8 @@ class App extends Component {
     this.setState({
       vars: temp
     });
-
-    console.log(this.state.vars);
   }
+
   handleExport = async () => {
     const nGROKendpoint = 'http://127.0.0.1:8080/export';
     const rawResponse = await fetch(nGROKendpoint,
@@ -89,6 +104,8 @@ class App extends Component {
     element.href = URL.createObjectURL(file);
     element.download = "EXPORT_CALC.txt";
     element.click();
+
+    this.closeSession();
   }
 
   handleImport = async (text) => {
@@ -110,7 +127,6 @@ class App extends Component {
         isModalOpen: !isModalOpen
     });
   }
-
 
   handleChange = async (e,data) => {
     const nGROKendpoint = 'http://127.0.0.1:8080/getresult';
@@ -173,13 +189,20 @@ class App extends Component {
   checkDelete = () => {
     const {expression} = this.state;
 
-    if(expression.length >= 5 && expression.includes("clear")){
+    if(expression.length > 6 && expression.includes("clear")){
       this.setState({
         isDelete: expression.includes("clear"),
         isVariable: false
       });
     }
     else {
+      if(expression === "clear"){
+        this.setState({
+          isDelete: false,
+          isCompleteDelete: true,
+          isVariable: false
+        });
+      }
       this.setState({
         isDelete: false
       });
@@ -243,7 +266,7 @@ class App extends Component {
   }
 
   render() {
-    const { isVariable, isDelete, isExport, isImport, isExiting, expression, value, isModalOpen, vars }  = this.state;
+    const { isVariable, isDelete, isCompleteDelete, isExport, isImport, isExiting, expression, value, isModalOpen, vars }  = this.state;
     const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
     return (
@@ -257,7 +280,7 @@ class App extends Component {
                 <List.Item>
                   <List.Content>
                     <List.Header inverted>{alphabet[index]}</List.Header>
-                    <p inverted>{variable.value !== "0" ? "expression: " + variable.expression : ""}</p>
+                    <p inverted>{"expression: " + variable.expression}</p>
                     <p inverted>{variable.value !== "0" ? "value: " + variable.value : ""}</p>
                   </List.Content>
                 </List.Item>
@@ -295,6 +318,14 @@ class App extends Component {
           </div>
           }
           {
+            isCompleteDelete &&
+            <div style={{paddingBottom: 20}}>
+            <Button onClick={this.handleCompleteDel} size="big" fluid color='red'>
+              Delete All
+            </Button>
+          </div>
+          }
+          {
             isExport &&
             <div style={{paddingBottom: 20}}>
             <Button onClick={this.handleExport} size="big" fluid color='green'>
@@ -318,9 +349,14 @@ class App extends Component {
           {
             isExiting &&
             <div style={{paddingBottom: 20}}>
-            <Button onClick={this.closeSession} size="big" fluid color='grey'>
-              Exit
-            </Button>
+              <div style={{paddingBottom: 20}}>
+                <Button onClick={this.closeSession} size="big" fluid color='grey'>
+                  Exit
+                </Button>
+              </div>
+              <Button onClick={this.handleExport} size="big" fluid color='green'>
+                Export and Exit
+              </Button>
           </div>
           }
             <Input label='exp' onChange={this.handleChange} fluid size="medium" icon='calculator' placeholder='Numbers go here...' />
@@ -363,7 +399,22 @@ class App extends Component {
             <Header style={{paddingTop: 80, color: 'white'}} size='huge'>
               {value}
             </Header>
-
+            <Header size='huge'>
+              <span role="img" aria-label="question">
+                🌊
+              </span>
+            </Header>
+            <div class="ui footer">
+              <p>Created using a little bit of
+                <a href="https://github.com/eidheim/Simple-Web-Server">
+                  <br/>this<br/>
+                </a>
+                and a little bit of
+                <a href="https://www.boost.org/">
+                   <br/>that
+                </a>.
+              </p>
+            </div>
         </div>
         </header>
       </div>
