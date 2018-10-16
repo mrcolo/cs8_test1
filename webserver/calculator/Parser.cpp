@@ -34,8 +34,8 @@ void Parser::tokenize(const std::string input, double* memory_val) {
     for (unsigned int i = 0; i < input.length(); ++i) {
         if (tokens.full())
             throw QFULL;
-//        if (!isValid(input[i])) // TODO: THIS IS MESSING UP STORING OF MEMORY BUT WE NEED FOR ERROR CHECK!
-//            throw BAD_EXP;
+        if (!isValid(input[i])) // TODO: THIS IS MESSING UP STORING OF MEMORY BUT WE NEED FOR ERROR CHECK!
+            throw BAD_EXP;
         // If character is a delimiter, move on.
         if (input[i] == ' ' || input[i] == ',') {
             continue;
@@ -140,25 +140,30 @@ void Parser::infixToPostfix() {
 double Parser::evaluatePostfix() {
     variant<double,char> token;
     // Increment postfix queue until empty.
-    while (!postfix.empty()) {
-        token = postfix.dequeue();
-        // If character is an operand, push to operand stack;
-        if (token.type() == typeid(double)) {
-            operands.push(get<double>(token));
+    try {
+        while (!postfix.empty()) {
+            token = postfix.dequeue();
+            // If character is an operand, push to operand stack;
+            if (token.type() == typeid(double)) {
+                operands.push(get<double>(token));
+            }
+                // If character is operator, pop two elements from stack, perform operation and push the result back.
+            else if (isOperator(get<char>(token))) {
+                // Pop two operands.
+                double operand2 = operands.pop();
+                double operand1 = operands.pop();
+                // Perform operation
+                double result = performOperation(get<char>(token), operand1, operand2);
+                //Push back result of operation on stack.
+                operands.push(result);
+            }
         }
-        // If character is operator, pop two elements from stack, perform operation and push the result back.
-        else if (isOperator(get<char>(token))) {
-            // Pop two operands.
-            double operand2 = operands.pop();
-            double operand1 = operands.pop();
-            // Perform operation
-            double result = performOperation(get<char>(token), operand1, operand2);
-            //Push back result of operation on stack.
-            operands.push(result);
-        }
+        // If input is in correct format, operand stack will have one element. This will be the output.
+        return operands.pop();
     }
-    // If input is in correct format, operand stack will have one element. This will be the output.
-    return operands.pop();;
+    catch(STACK_ERRORS s){
+        cout<<"A stack error occured."<<endl;
+    }
 }
 
 double add(double operand1, double operand2) {
@@ -196,7 +201,7 @@ double Parser::performOperation(char operation, double operand1, double operand2
 
 // Function to check if character is valid.
 bool Parser::isValid(char C) {
-    return (isOperand(C) || isOperator(C) || isParens(C) || C == '=');
+    return (isOperand(C) || isOperator(C) || isParens(C) || C == '=' || C ==' ');
 }
 
 // Function to check if character is letter or digit.
