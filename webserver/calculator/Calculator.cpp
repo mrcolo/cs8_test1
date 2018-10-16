@@ -6,6 +6,7 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <sstream>
+#include <algorithm>
 
 using boost::property_tree::ptree;
 using boost::property_tree::read_json;
@@ -81,18 +82,28 @@ void Calculator::copy(const Calculator &other){
 
 }
 
-bool Calculator::isValidVar(string s){
+bool Calculator::isValidVar(string& s){
 
-    for(int i = 0; i < s.length(); i++)
-        if(s[i] == ' ')
-            s.erase(i, 1);
+    sanitize(s);
     cout<<"MYSTRING: "<<s<<endl;
     return isalpha(s[0]) && s[1] == '=';
 }
 
+void Calculator::sanitize(string& s){
+    s.erase(std::remove(s.begin(), s.end(), ' '),
+               s.end());
+
+    cout<<"MYSTRING: "<<s<<endl;
+}
+
 string Calculator::evaluate(string s){
+
+    sanitize(s);
+
     cout<<"Evaluating "<<s<<"..."<<endl;
+
     double d = 0;
+
     try {
         p.tokenize(s,memory_val);
         p.infixToPostfix();

@@ -42,7 +42,9 @@ private:
     void reset();
     void runCommands(vector<CALC_ACTIONS> s, vector<string> s2);
     void recompute();
-    bool isValidVar(string s);
+    void sanitize(string& s);
+    bool isValidVar(string& s);
+
     string action_to_string(CALC_ACTIONS c);
     CALC_ACTIONS string_to_action(string s);
     void copy(const Calculator &other);

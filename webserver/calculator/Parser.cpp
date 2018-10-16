@@ -140,7 +140,7 @@ void Parser::infixToPostfix() {
 double Parser::evaluatePostfix() {
     variant<double,char> token;
     // Increment postfix queue until empty.
-    try {
+
         while (!postfix.empty()) {
             token = postfix.dequeue();
             // If character is an operand, push to operand stack;
@@ -160,10 +160,8 @@ double Parser::evaluatePostfix() {
         }
         // If input is in correct format, operand stack will have one element. This will be the output.
         return operands.pop();
-    }
-    catch(STACK_ERRORS s){
-        cout<<"A stack error occured."<<endl;
-    }
+
+
 }
 
 double add(double operand1, double operand2) {
