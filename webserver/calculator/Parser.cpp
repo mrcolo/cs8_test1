@@ -6,7 +6,6 @@ struct perform {
     typedef double (*operation)(double, double);
 };
 
-//TODO NEED TO WRITE
 Parser::Parser() = default;
 
 Parser::~Parser() {
@@ -31,24 +30,30 @@ void Parser::tokenize(const std::string input, double* memory_val) {
     postfix.clear();
     operands.clear();
     operators.clear();
-    if (!isValid(input))
-        throw BAD_EXP;
-    int j = 0;
     // Increment input until the end.
-    for (unsigned int i = 0; i < input.length(); ++i, ++j) {
+    for (unsigned int i = 0; i < input.length(); ++i) {
         if (tokens.full())
             throw QFULL;
+//        if (!isValid(input[i])) // TODO: THIS IS MESSING UP STORING OF MEMORY BUT WE NEED FOR ERROR CHECK!
+//            throw BAD_EXP;
         // If character is a delimiter, move on.
         if (input[i] == ' ' || input[i] == ',') {
             continue;
         }
         // If character is an operator or parenthesis, add to token queue.
         if (isOperator(input[i]) || isParens(input[i])) {
-            tokens.enqueue(input[i]);
+            // If character is a unary minus, add -1 and * instead of minus operator.
+            if (input[i] == '-' && (i == 0 || isOperator(input[i-1]) || isParens(input[i-1]))) {
+                double num = -1;
+                char mult = '*';
+                tokens.enqueue(num);
+                tokens.enqueue(mult);
+            } else {
+                tokens.enqueue(input[i]);
+            }
         }
         // If character is a letter (A-Z), grab memory value and add to token queue.
         if (isLetter(input[i])) {
-
             tokens.enqueue(memory_val[toupper(input[i])-65]);
         }
         // If character is a number, check for decimal and add double to token queue.
@@ -94,9 +99,9 @@ void Parser::infixToPostfix() {
             }
                 // If an operator is scanned
             else if (isOperator(get<char>(token))) {
-                // Special case for negatives. TODO ISSUE IS HERE WITH NEGATIVE I THINK I FIXED IT
+                // Special case for negatives.
                 if (prev.type() == typeid(char)) {
-                    if (get<char>(token) == '-' && get<char>(prev) == '(')
+                    if (get<char>(token) == '-' && (get<char>(prev) == '(' || isOperator(get<char>(prev))))
                         isNegative = true;
                     else {
                         // Check for operator precedence and add operators to output queue accordingly.
@@ -158,8 +163,8 @@ double Parser::evaluatePostfix() {
 
 double add(double operand1, double operand2) {
         return operand1 + operand2;
-
 }
+
 double sub(double operand1, double operand2) {
         return operand1 - operand2;
 }
@@ -175,6 +180,7 @@ double divide(double operand1, double operand2) {
 double exp(double operand1, double operand2) {
         return pow(operand1, operand2);
 }
+
 // Function to perform an operation and return output.
 double Parser::performOperation(char operation, double operand1, double operand2) {
     perform::operation os [128];
@@ -188,11 +194,9 @@ double Parser::performOperation(char operation, double operand1, double operand2
     return os[operation](operand1, operand2);
 }
 
-// TODO WRITE ISVALID FUNCTION IN CALCULATOR CLASS
-// Function to check if input expression is valid.
-bool Parser::isValid(const std::string input) {
-
-    return true;
+// Function to check if character is valid.
+bool Parser::isValid(char C) {
+    return (isOperand(C) || isOperator(C) || isParens(C) || C == '=');
 }
 
 // Function to check if character is letter or digit.
@@ -235,7 +239,6 @@ int Parser::prec(char C) {
     else
         return -1;
 }
-
 
 void Parser::nuke() {
     tokens.clear();

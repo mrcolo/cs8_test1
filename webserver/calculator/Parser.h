@@ -41,7 +41,7 @@ private:
 
     // Private functions.
     double performOperation(char operation, double operand1, double operand2);
-    bool isValid(std::string input);
+    bool isValid(char C);
     bool isOperand(char C);
     bool isOperator(char C);
     bool isParens(char C);
