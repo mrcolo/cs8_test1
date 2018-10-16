@@ -27,14 +27,6 @@ public:
     void tokenize(std::string input, double* memory_val);
     void infixToPostfix();
     double evaluatePostfix();
-    double performOperation(char operation, double operand1, double operand2);
-    bool isValid(std::string input);
-    bool isOperand(char C);
-    bool isOperator(char C);
-    bool isParens(char C);
-    bool isDigit(char C);
-    bool isLetter(char C);
-    int prec(char C);
 
     // Friend functions.
     friend std::ostream& operator<<(std::ostream &out, const Parser &p);
@@ -48,6 +40,14 @@ private:
     Stack<char> operators;
 
     // Private functions.
+    double performOperation(char operation, double operand1, double operand2);
+    bool isValid(std::string input);
+    bool isOperand(char C);
+    bool isOperator(char C);
+    bool isParens(char C);
+    bool isDigit(char C);
+    bool isLetter(char C);
+    int prec(char C);
     void nuke();
     void copy(const Parser &other);
 };

@@ -23,6 +23,7 @@ public:
     void addVar(string s);
     string getVars();
     void delVar(string s);
+    void delAll();
     string exportSession();
     void importSession(string s);
 
@@ -38,7 +39,9 @@ private:
 
     // Private functions.
     void nuke();
+    void reset();
     void runCommands(vector<CALC_ACTIONS> s, vector<string> s2);
+    void recompute();
     bool isValidVar(string s);
     string action_to_string(CALC_ACTIONS c);
     CALC_ACTIONS string_to_action(string s);

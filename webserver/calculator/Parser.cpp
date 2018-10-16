@@ -191,7 +191,7 @@ double Parser::performOperation(char operation, double operand1, double operand2
 // TODO WRITE ISVALID FUNCTION IN CALCULATOR CLASS
 // Function to check if input expression is valid.
 bool Parser::isValid(const std::string input) {
-    // check std::string expression and return true or false...
+
     return true;
 }
 
@@ -236,22 +236,18 @@ int Parser::prec(char C) {
         return -1;
 }
 
-// TODO WRITE NUKE
+
 void Parser::nuke() {
-
+    tokens.clear();
+    postfix.clear();
+    operands.clear();
+    operators.clear();
 }
 
-// TODO WRITE COPY
 void Parser::copy(const Parser &other) {
-
+    tokens = other.tokens;
+    postfix = other.postfix;
+    operands = other.operands;
+    operators = other.operators;
 }
 
-// TODO WRITE <<
-std::ostream& operator<<(std::ostream &out, const Parser &p) {
-    return out;
-}
-
-// TODO WRITE >>
-std::istream& operator>>(std::istream &in, Parser &p) {
-    return in;
-}

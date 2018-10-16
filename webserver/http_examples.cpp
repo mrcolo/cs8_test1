@@ -52,12 +52,23 @@ int main() {
                   << content;
   };
 
+    server.resource["^/delall$"]["POST"] = [&c](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
+
+        c.delAll();
+        string content = "Deleted All!";
+        *response << "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Length: " << content.length() << "\r\n\r\n"
+                  << content;
+    };
+
   server.resource["^/getvar$"]["POST"] = [&c](shared_ptr<HttpServer::Response> response, shared_ptr<HttpServer::Request> request) {
       string content = c.getVars();
         cout<<c.getVars();
         *response << "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Length: " << content.length() << "\r\n\r\n"
                   << content;
     };
+
+  //TODO add endpoint for clearing the whole thing.
+
 
   server.on_error = [](shared_ptr<HttpServer::Request> /*request*/, const SimpleWeb::error_code & /*ec*/) {
   };
@@ -71,6 +82,7 @@ int main() {
   cout<<"Calc Server has started at port 8080"<<endl;
 
   // Wait for server to start so that the client can connect
+    // MASTER Thread
   this_thread::sleep_for(chrono::seconds(1));
   server_thread.join();
 }

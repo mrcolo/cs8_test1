@@ -21,7 +21,6 @@ Calculator::Calculator(){
         memory_val[i] = 0;
     }
 
-
     m1.insert({EVAL, "EVAL"});
     m1.insert({ADDV,"ADDV"});
     m1.insert({DELV,"DELV"});
@@ -51,7 +50,7 @@ Calculator& Calculator::operator=(const Calculator &other) {
 
 void Calculator::nuke(){
 
-    for(int i = 0; i < 26; i++){
+    for(int i = 0; i < 26; i++) {
         memory_exp[i] = "";
         memory_val[i] = 0;
     }
@@ -61,6 +60,13 @@ void Calculator::nuke(){
 
     memory_exp = nullptr;
     memory_val = nullptr;
+}
+
+void Calculator::reset() {
+    for (int i = 0; i < 26; i++) {
+        memory_exp[i] = "";
+        memory_val[i] = 0;
+    }
 }
 
 void Calculator::copy(const Calculator &other){
@@ -76,8 +82,12 @@ void Calculator::copy(const Calculator &other){
 }
 
 bool Calculator::isValidVar(string s){
-    //TODO improve this with a better check
-    return isalpha(s[0]) && s[2] == '=';
+
+    for(int i = 0; i < s.length(); i++)
+        if(s[i] == ' ')
+            s.erase(i, 1);
+    cout<<"MYSTRING: "<<s<<endl;
+    return isalpha(s[0]) && s[1] == '=';
 }
 
 string Calculator::evaluate(string s){
@@ -125,6 +135,16 @@ string Calculator::evaluate(string s){
     return ss.str();
 }
 
+void Calculator::recompute() {
+    for(int i = 0; i < 26 ; i++){
+        if(memory_exp[i] != ""){
+            p.tokenize(memory_exp[i], memory_val);
+            p.infixToPostfix();
+            memory_val[i] = p.evaluatePostfix();
+        }
+    }
+}
+
 void Calculator::addVar(string s){
     try {
         if (!isValidVar(s))
@@ -133,9 +153,9 @@ void Calculator::addVar(string s){
             exp_action.push_back(ADDV);
             exp_values.push_back(s);
         }
+
         auto pos = s.find('=');
 
-        //TODO this is not efficient, it should get the function in isvalid.
         auto sub_var = static_cast<char>(toupper(s[0]));
 
         cout << "Adding " << sub_var << "..." << endl;
@@ -144,15 +164,13 @@ void Calculator::addVar(string s){
         p.tokenize(memory_exp[sub_var - 65], memory_val);
         p.infixToPostfix();
 
-        double d;
-        d = p.evaluatePostfix();
+        memory_val[sub_var - 65] = p.evaluatePostfix();
 
-        memory_val[sub_var - 65] = d;
+        recompute();
     }
     catch(EXPRESSION_ERRORS e) {
         cout<<"Expression error occurred"<<endl;
     }
-
 }
 
 string Calculator::getVars(){
@@ -160,7 +178,7 @@ string Calculator::getVars(){
     ptree arr;
     string alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-    for (unsigned int i = 0; i < 26; ++i) {
+    for (unsigned int i = 0; i < 26; ++i){
         ptree temp;
         temp.put<string>("expression", memory_exp[i]);
         temp.put<double>("value", memory_val[i]);
@@ -205,9 +223,13 @@ string Calculator::exportSession(){
     return result;
 }
 
+void Calculator::delAll(){
+    cout<<"Deleting all the expressions..."<<endl;
+    reset();
+}
+
 void Calculator::importSession(string s){
-    //TODO understand why this is erroring out.
-    //nuke();
+    reset();
 
     stringstream ss;
 
