@@ -133,7 +133,7 @@ class App extends Component {
     let temp = data.value;
     let resultString = "";
     if(temp.includes("="))
-      resultString = temp.substr(temp.indexOf("="), temp.length - temp.indexOf("=") )
+      resultString = temp.substr(temp.indexOf("=")+1, temp.length - temp.indexOf("=")+1 )
     else {
       resultString = data.value;
     }
