@@ -12,16 +12,19 @@ using boost::property_tree::ptree;
 using boost::property_tree::read_json;
 using boost::property_tree::write_json;
 
-
 Calculator::Calculator(){
+
+    //Initialize spaces in memory for storing expressions and their values.
     memory_exp = new string[26];
     memory_val = new double[26];
 
+    //Set them to 0 and ""
     for (int i = 0; i < 26; ++i) {
         memory_exp[i] = "";
         memory_val[i] = 0;
     }
 
+    //Set up the helper maps
     m1.insert({EVAL, "EVAL"});
     m1.insert({ADDV,"ADDV"});
     m1.insert({DELV,"DELV"});
@@ -32,15 +35,17 @@ Calculator::Calculator(){
 }
 
 Calculator::~Calculator(){
+    //Destroy everything.
     nuke();
 }
 
 Calculator::Calculator(const Calculator &other) {
+    //Create copy.
     copy(other);
 }
 
 Calculator& Calculator::operator=(const Calculator &other) {
-
+    //Copy another calculator into this one.
     if (this != &other) {
         nuke();
         copy(other);
@@ -50,15 +55,14 @@ Calculator& Calculator::operator=(const Calculator &other) {
 }
 
 void Calculator::nuke(){
+    //Reset the values.
+    reset();
 
-    for(int i = 0; i < 26; i++) {
-        memory_exp[i] = "";
-        memory_val[i] = 0;
-    }
-
+    //delete the dynamic arrays.
     delete [] memory_exp;
     delete [] memory_val;
 
+    //set the pointers to nullptrs.
     memory_exp = nullptr;
     memory_val = nullptr;
 }
@@ -79,25 +83,26 @@ void Calculator::copy(const Calculator &other){
         memory_exp[i] = other.memory_exp[i];
         memory_val[i] = other.memory_val[i];
     }
-
 }
 
 bool Calculator::isValidVar(string& s){
-
+    //Remove spaces.
     sanitize(s);
-    cout<<"MYSTRING: "<<s<<endl;
+
     return isalpha(s[0]) && s[1] == '=';
 }
 
 void Calculator::sanitize(string& s){
+
+    //Remove all the spaces
     s.erase(std::remove(s.begin(), s.end(), ' '),
                s.end());
 
-    cout<<"MYSTRING: "<<s<<endl;
 }
 
 string Calculator::evaluate(string s){
 
+    //Sanitize the string before being evaluated.
     sanitize(s);
 
     cout<<"Evaluating "<<s<<"..."<<endl;
@@ -105,14 +110,22 @@ string Calculator::evaluate(string s){
     double d = 0;
 
     try {
+        //Tokenize the string
         p.tokenize(s,memory_val);
+
+        //Convert it to Postfix
         p.infixToPostfix();
+
+        //Evaluate to postfix.
         d = p.evaluatePostfix();
+
+        //If everything worked out fine, push the operation to our vector.
         exp_action.push_back(EVAL);
         exp_values.push_back(s);
     }
     catch (EXPRESSION_ERRORS e) {
         if (e){
+            //In case of an expression error, just send an "error json".
             ptree temp;
             temp.put<bool>("expression", false);
             temp.put<double>("value",0);
@@ -122,6 +135,7 @@ string Calculator::evaluate(string s){
         }
     }
     catch (STACK_ERRORS e) {
+        //In case of an expression error, just send an "error json".
         ptree temp;
         temp.put<bool>("expression", false);
         temp.put<double>("value",0);
@@ -130,6 +144,7 @@ string Calculator::evaluate(string s){
         return ss.str();
     }
     catch (QUEUE_ERRORS e) {
+        //In case of an expression error, just send an "error json".
         ptree temp;
         temp.put<bool>("expression", false);
         temp.put<double>("value",0);
@@ -137,7 +152,7 @@ string Calculator::evaluate(string s){
         write_json(ss, temp);
         return ss.str();
     }
-
+    //In case of a good expression, send the result as json.
     ptree temp;
     temp.put<bool>("expression", true);
     temp.put<double>("value",d);
@@ -147,6 +162,8 @@ string Calculator::evaluate(string s){
 }
 
 void Calculator::recompute() {
+
+    //Recompute all the expressions. This executes when the user adds a new value.
     for(int i = 0; i < 26 ; i++){
         if(memory_exp[i] != ""){
             p.tokenize(memory_exp[i], memory_val);

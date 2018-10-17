@@ -7,7 +7,6 @@
 #include <boost/filesystem.hpp>
 #ifdef HAVE_OPENSSL
 #include "crypto.hpp"
-#include <algorithm>
 #endif
 
 using namespace std;
