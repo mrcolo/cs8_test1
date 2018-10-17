@@ -43,7 +43,7 @@ void Parser::tokenize(const std::string input, double* memory_val) {
         // If character is an operator or parenthesis, add to token queue.
         if (isOperator(input[i]) || isParens(input[i])) {
             // If character is a unary minus, add -1 and * instead of minus operator.
-            if (input[i] == '-' && (i == 0 || isOperator(input[i-1]) || isParens(input[i-1]))) {
+            if (input[i] == '-' && (i == 0 || isOperator(input[i-1]) || input[i-1] == '(')) {
                 double num = -1;
                 char mult = '*';
                 tokens.enqueue(num);
