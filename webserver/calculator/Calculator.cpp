@@ -85,15 +85,12 @@ void Calculator::copy(const Calculator &other){
 bool Calculator::isValidVar(string& s){
 
     sanitize(s);
-    cout<<"MYSTRING: "<<s<<endl;
     return isalpha(s[0]) && s[1] == '=';
 }
 
 void Calculator::sanitize(string& s){
     s.erase(std::remove(s.begin(), s.end(), ' '),
                s.end());
-
-    cout<<"MYSTRING: "<<s<<endl;
 }
 
 string Calculator::evaluate(string s){
