@@ -105,7 +105,6 @@ class App extends Component {
     element.download = "EXPORT_CALC.txt";
     element.click();
 
-    this.closeSession();
   }
 
   handleImport = async (text) => {
@@ -142,10 +141,9 @@ class App extends Component {
         body: resultString
       }
       );
-
     const myJSON = JSON.parse(await rawResponse.text())
     this.setState({
-      value: myJSON.expression ? myJSON.value : "",
+      value: (myJSON.expression === "true") ? myJSON.value : "🤯 Not a valid expression. 🤯",
       expression: data.value
     });
 
@@ -203,9 +201,13 @@ class App extends Component {
           isVariable: false
         });
       }
-      this.setState({
-        isDelete: false
-      });
+      else{
+        this.setState({
+          isDelete: false,
+          isCompleteDelete: false,
+        });
+      }
+
     }
   }
 
