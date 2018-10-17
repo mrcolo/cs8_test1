@@ -199,7 +199,7 @@ double Parser::performOperation(char operation, double operand1, double operand2
 
 // Function to check if character is valid.
 bool Parser::isValid(char C) {
-    return (isOperand(C) || isOperator(C) || isParens(C) || C == '=' || C ==' ');
+    return (isOperand(C) || isOperator(C) || isParens(C) || C == '=' || C == ' ' || C == '.');
 }
 
 // Function to check if character is letter or digit.
