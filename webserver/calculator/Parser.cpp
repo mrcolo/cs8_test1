@@ -45,7 +45,7 @@ void Parser::tokenize(const std::string input, double* memory_val) {
             // If character is a unary minus, add -1 and * instead of minus operator.
             if (input[i] == '-' && (i == 0 || isOperator(input[i-1]) || input[i-1] == '(')) {
                 double num = -1;
-                char mult = '*';
+                char mult = '!';
                 tokens.enqueue(num);
                 tokens.enqueue(mult);
             } else {
@@ -198,6 +198,7 @@ double Parser::performOperation(char operation, double operand1, double operand2
     os['+'] = &add;
     os['-'] = &sub;
     os['*'] = &multiply;
+    os['!'] = &multiply;
     os['/'] = &divide;
     os['^'] = &exp;
 
@@ -206,7 +207,7 @@ double Parser::performOperation(char operation, double operand1, double operand2
 
 // Function to check if character is valid.
 bool Parser::isValid(char C) {
-    return (isOperand(C) || isOperator(C) || isParens(C) || C == '=' || C == ' ' || C == '.');
+    return (isOperand(C) || isOperator(C) || isParens(C) || C == '=' || C == ' ' || C == '.' || C == '!');
 }
 
 // Function to check if character is letter or digit.
@@ -220,7 +221,7 @@ bool Parser::isOperand(char C) {
 
 // Function to check if character is operator.
 bool Parser::isOperator(char C) {
-    return C == '+' || C == '-'|| C == '*' || C == '/' || C == '^';
+    return C == '+' || C == '-'|| C == '*' || C == '/' || C == '^' || C == '!';
 }
 
 // Function to check if character is a parenthesis.
@@ -240,7 +241,9 @@ bool Parser::isLetter(char C) {
 
 // Function to determine precedence of operator.
 int Parser::prec(char C) {
-    if(C == '^')
+    if(C == '!')
+        return 4;
+    else if(C == '^')
         return 3;
     else if(C == '*' || C == '/')
         return 2;
