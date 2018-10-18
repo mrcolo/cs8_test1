@@ -118,6 +118,7 @@ string Calculator::evaluate(string s){
 
         //Evaluate to postfix.
         d = p.evaluatePostfix();
+        d = round(d*1000000.0)/1000000.0;
 
         //If everything worked out fine, push the operation to our vector.
         exp_action.push_back(EVAL);

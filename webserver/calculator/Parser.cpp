@@ -59,7 +59,14 @@ void Parser::tokenize(const std::string input, double* memory_val) {
         // If character is a number, check for decimal and add double to token queue.
         else if (isDigit(input[i]) || input[i] == '.') {
             std::string num;
+            int dot_counter = 0;
             while (isDigit(input[i]) || input[i] == '.') {
+                if (input[i] == '.') {
+                    ++dot_counter;
+                }
+                if (dot_counter > 1) {
+                    throw BAD_EXP;
+                }
                 num += input[i];
                 ++i;
             }
