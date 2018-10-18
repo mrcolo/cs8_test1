@@ -119,6 +119,7 @@ string Calculator::evaluate(string s){
         //Evaluate to postfix.
         d = p.evaluatePostfix();
         d = round(d*1000000.0)/1000000.0;
+        std::cout << "data: " << d << std::endl;
 
         //If everything worked out fine, push the operation to our vector.
         exp_action.push_back(EVAL);
@@ -156,9 +157,10 @@ string Calculator::evaluate(string s){
     //In case of a good expression, send the result as json.
     ptree temp;
     temp.put<bool>("expression", true);
-    temp.put<double>("value",d);
+    temp.put<std::string>("value",std::to_string(d));
     stringstream ss;
     write_json(ss, temp);
+    std::cout << ss.str() << std::endl;
     return ss.str();
 }
 
